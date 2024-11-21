@@ -111,9 +111,9 @@ def register(request):
 def activate_account(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = CustomUser.objects.get(pk=uid)
+        user = User.objects.get(pk=uid)
         token_obj = EmailVerificationToken.objects.get(user=user, token=token)
-    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist, EmailVerificationToken.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist, EmailVerificationToken.DoesNotExist):
         user = None
         token_obj = None
 
