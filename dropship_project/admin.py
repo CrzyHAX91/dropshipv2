@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.urls import path
 from django.shortcuts import render
 from .models import CustomUser, Product, Order, CartItem
+from .admin_filters import DateRangeFilter
+from .admin_widgets import QuickLinksWidget, RecentOrdersWidget, SalesStatisticsWidget
 import json
 
 class CustomAdminSite(admin.AdminSite):
@@ -12,7 +14,7 @@ class CustomAdminSite(admin.AdminSite):
     site_title = 'Dropship Admin Portal'
     index_title = 'Welcome to Dropship Admin Portal'
     login_template = 'admin/login.html'
-    index_template = 'admin/index.html'
+    index_template = 'admin/dashboard.html'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -23,14 +25,12 @@ class CustomAdminSite(admin.AdminSite):
 
     def index(self, request, extra_context=None):
         extra_context = extra_context or {}
-        extra_context['user_count'] = CustomUser.objects.count()
-        extra_context['product_count'] = Product.objects.count()
-        extra_context['order_count'] = Order.objects.count()
-        extra_context['recent_orders'] = Order.objects.order_by('-created_at')[:5]
+        extra_context['quick_links'] = QuickLinksWidget()
+        extra_context['recent_orders'] = RecentOrdersWidget()
+        extra_context['sales_statistics'] = SalesStatisticsWidget()
         return super().index(request, extra_context)
 
     def order_stats_view(self, request):
-        # Get order counts for the last 7 days
         end_date = timezone.now().date()
         start_date = end_date - timezone.timedelta(days=6)
         order_data = Order.objects.filter(created_at__date__range=[start_date, end_date])             .values('created_at__date')             .annotate(count=Count('id'))             .order_by('created_at__date')
@@ -78,7 +78,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Order, site=admin_site)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'total_price', 'status', 'created_at')
-    list_filter = ('status', 'created_at')
+    list_filter = ('status', DateRangeFilter)
     search_fields = ('user__username', 'user__email')
     actions = ['mark_as_shipped']
 
