@@ -1,6 +1,6 @@
 import logging
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, update_session_auth_hash
+from django.contrib.auth import login, authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -17,74 +17,13 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import PasswordResetView, LoginView
 from django_ratelimit.decorators import ratelimit
+from two_factor.utils import default_device
 
 from .models import Product, Order, CustomUser, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
 from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm, CustomAuthenticationForm
 
 logger = logging.getLogger('dropship')
-
-@login_required
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def change_password(request):
-    if request.method == 'POST':
-        form = CustomPasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            logger.info(f"Password changed successfully for user: {user.username}")
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
-        else:
-            logger.warning(f"Failed password change attempt for user: {request.user.username}")
-            messages.error(request, 'Please correct the error below.')
-    else:
-        form = CustomPasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {'form': form})
-
-@login_required
-def user_profile(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            logger.info(f"Profile updated for user: {request.user.username}")
-            messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('user_profile')
-        else:
-            logger.warning(f"Failed profile update attempt for user: {request.user.username}")
-    else:
-        form = UserProfileForm(instance=request.user)
-    return render(request, 'user_profile.html', {'form': form})
-
-class RateLimitedLoginView(LoginView):
-    authentication_form = CustomAuthenticationForm
-
-    @method_decorator(ratelimit(key='ip', rate='5/m', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        remember_me = form.cleaned_data.get('remember_me')
-        if not remember_me:
-            self.request.session.set_expiry(0)
-        logger.info(f"Successful login for user: {form.get_user().username}")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(f"Failed login attempt for username: {form.data.get('username')}")
-        return super().form_invalid(form)
-
-class RateLimitedPasswordResetView(PasswordResetView):
-    @method_decorator(ratelimit(key='ip', rate='3/h', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        logger.info(f"Password reset requested for email: {form.cleaned_data['email']}")
-        return super().form_valid(form)
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -130,10 +69,30 @@ def activate_account(request, uidb64, token):
         token_obj.delete()
         login(request, user)
         logger.info(f"User account activated: {user.username}")
-        return redirect('home')
+        return redirect('two_factor:setup')
     else:
         logger.warning(f"Invalid account activation attempt: {uidb64}")
         return render(request, 'registration/activation_invalid.html')
+
+@login_required
+def user_profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            logger.info(f"User profile updated: {request.user.username}")
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('user_profile')
+        else:
+            logger.warning(f"Failed profile update attempt for user: {request.user.username}")
+    else:
+        form = UserProfileForm(instance=request.user)
+    
+    default_device_obj = default_device(request.user)
+    return render(request, 'user_profile.html', {
+        'form': form,
+        'default_device': default_device_obj,
+    })
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
