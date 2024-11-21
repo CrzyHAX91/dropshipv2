@@ -18,25 +18,3 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             self.add_error('new_password1', error)
         return password1
 
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'date_of_birth']
-        widgets = {
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2')
-
-    def save(self, commit=True):
-        user = super(UserRegistrationForm, self).save(commit=False)
-        user.email = self.cleaned_data['email']
-        if commit:
-            user.save()
-        return user
-
