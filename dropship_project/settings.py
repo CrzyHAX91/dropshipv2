@@ -249,3 +249,7 @@ LOGGING = {
     },
 }
 
+
+# Custom admin settings
+TEMPLATES[0]['DIRS'] += [BASE_DIR / 'templates']
+
