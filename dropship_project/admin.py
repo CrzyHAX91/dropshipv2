@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
+from django.utils import timezone
 from .models import CustomUser, Product, Order, CartItem
 
 class CustomAdminSite(admin.AdminSite):
@@ -39,6 +40,12 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'total_price', 'status', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('user__username', 'user__email')
+    actions = ['mark_as_shipped']
+
+    def mark_as_shipped(self, request, queryset):
+        updated = queryset.update(status='shipped', shipped_at=timezone.now())
+        self.message_user(request, f'{updated} orders were successfully marked as shipped.')
+    mark_as_shipped.short_description = "Mark selected orders as shipped"
 
 @admin.register(CartItem, site=admin_site)
 class CartItemAdmin(admin.ModelAdmin):
