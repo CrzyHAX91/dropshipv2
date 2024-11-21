@@ -1,0 +1,6 @@
+<h2>{{ widget.title }}</h2>
+<ul>
+    {% for link in widget.children %}
+        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+    {% endfor %}
+</ul>
