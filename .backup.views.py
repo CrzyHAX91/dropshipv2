@@ -58,18 +58,11 @@ def user_profile(request):
 logger = logging.getLogger('dropship')
 
 class RateLimitedLoginView(LoginView):
-    authentication_form = CustomAuthenticationForm
-
     @method_decorator(ratelimit(key='ip', rate='5/m', method=['GET', 'POST']))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
     def form_valid(self, form):
-        remember_me = form.cleaned_data.get('remember_me')
-        if not remember_me:
-            # Set session expiry to 0 seconds. So it will automatically close the session after the browser is closed.
-            self.request.session.set_expiry(0)
-
         logger.info(f"Successful login for user: {form.get_user()}")
         return super().form_valid(form)
 
