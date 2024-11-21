@@ -1,7 +1,6 @@
 
-import logging
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -21,8 +20,6 @@ from ratelimit.decorators import ratelimit
 from .models import Product, Order, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
 from .forms import UserRegistrationForm
-
-logger = logging.getLogger('dropship')
 
 class RateLimitedLoginView(LoginView):
     @method_decorator(ratelimit(key='ip', rate='5/m', method=['GET', 'POST']))
