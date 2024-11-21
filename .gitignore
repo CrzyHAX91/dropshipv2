@@ -29,3 +29,16 @@ env/
 ehthumbs.db
 Thumbs.db
 
+# Backup files
+*.bak
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Static files
+staticfiles/
+
+# Secret key
+*.secret
+
