@@ -1,12 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h1>Welcome, {{ user.username }}!</h1>
-    
-    <div class="row mt-4">
-        <div class="col-md-4">
+<div class="dashboard-header">
+    <div class="container">
+        <h1>Welcome, {{ user.username }}!</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 dashboard-section">
             <h2>Account Information</h2>
             <ul class="list-group">
                 <li class="list-group-item">Username: {{ user.username }}</li>
@@ -15,7 +23,7 @@
             </ul>
         </div>
         
-        <div class="col-md-4">
+        <div class="col-md-4 dashboard-section">
             <h2>Recent Orders</h2>
             {% if recent_orders %}
                 <ul class="list-group">
@@ -30,7 +38,7 @@
             {% endif %}
         </div>
         
-        <div class="col-md-4">
+        <div class="col-md-4 dashboard-section">
             <h2>Cart Items</h2>
             {% if cart_items %}
                 <ul class="list-group">
@@ -46,22 +54,20 @@
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <h2>Available Products</h2>
-            <div class="row">
-                {% for product in available_products %}
-                    <div class="col-md-3 mb-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ product.name }}</h5>
-                                <p class="card-text">${{ product.price }}</p>
-                                <a href="#" class="btn btn-primary">Add to Cart</a>
-                            </div>
+    <div class="dashboard-section">
+        <h2>Available Products</h2>
+        <div class="row">
+            {% for product in available_products %}
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">${{ product.price }}</p>
+                            <a href="#" class="btn btn-primary">Add to Cart</a>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>
