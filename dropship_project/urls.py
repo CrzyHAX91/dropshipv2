@@ -10,9 +10,9 @@ router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet)
 
 urlpatterns = [
+    path('', include(tf_urls)),
     path('admin/', admin_site.urls),
     path('', include(router.urls)),
-    path('', include(tf_urls)),
     path('register/', register, name='register'),
     path('activate/<str:uidb64>/<str:token>/', activate_account, name='activate_account'),
     path('password_reset/', RateLimitedPasswordResetView.as_view(), name='password_reset'),
