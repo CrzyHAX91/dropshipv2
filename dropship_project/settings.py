@@ -278,3 +278,11 @@ LOGIN_REDIRECT_URL = 'two_factor:profile'
 
 TWO_FACTOR_PATCH_ADMIN = True
 
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
