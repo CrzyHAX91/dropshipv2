@@ -135,14 +135,10 @@ def activate_account(request, uidb64, token):
         logger.warning(f"Invalid account activation attempt: {uidb64}")
         return render(request, 'registration/activation_invalid.html')
 
-from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
-
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [TokenHasReadWriteScope]
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [TokenHasReadWriteScope]
