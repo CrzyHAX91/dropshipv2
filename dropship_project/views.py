@@ -126,3 +126,21 @@ def user_dashboard(request):
     }
     return render(request, 'user_dashboard.html', context)
 
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Order, CartItem
+
+@login_required
+def user_dashboard(request):
+    user = request.user
+    recent_orders = Order.objects.filter(user=user).order_by('-created_at')[:5]
+    cart_items = CartItem.objects.filter(user=user)
+    
+    context = {
+        'user': user,
+        'recent_orders': recent_orders,
+        'cart_items': cart_items,
+    }
+    return render(request, 'user_dashboard.html', context)
+
