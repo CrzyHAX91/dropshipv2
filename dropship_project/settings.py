@@ -367,3 +367,11 @@ ADMIN_SITE_HEADER = "Dropship Admin"
 ADMIN_SITE_TITLE = "Dropship Admin Portal"
 ADMIN_INDEX_TITLE = "Welcome to Dropship Admin Portal"
 
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
