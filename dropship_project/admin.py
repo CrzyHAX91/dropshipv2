@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count
+from django.db.models import Count, F
 from django.utils import timezone
 from .models import CustomUser, Product, Order, CartItem
 
@@ -34,6 +34,17 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'stock', 'category')
     list_filter = ('category',)
     search_fields = ('name', 'description')
+    actions = ['increase_stock', 'decrease_stock']
+
+    def increase_stock(self, request, queryset):
+        updated = queryset.update(stock=F('stock') + 10)
+        self.message_user(request, f'Successfully increased stock for {updated} products.')
+    increase_stock.short_description = "Increase stock by 10"
+
+    def decrease_stock(self, request, queryset):
+        updated = queryset.update(stock=F('stock') - 10)
+        self.message_user(request, f'Successfully decreased stock for {updated} products.')
+    decrease_stock.short_description = "Decrease stock by 10"
 
 @admin.register(Order, site=admin_site)
 class OrderAdmin(admin.ModelAdmin):
