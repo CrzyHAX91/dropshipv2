@@ -1,13 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm, AuthenticationForm
 from django.contrib.auth import password_validation
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
 from .models import CustomUser
 
 class CustomAuthenticationForm(AuthenticationForm):
     remember_me = forms.BooleanField(required=False, initial=False)
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
