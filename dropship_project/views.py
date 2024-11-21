@@ -102,3 +102,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+
+from two_factor.views import LoginView
+
+class CustomLoginView(LoginView):
+    template_name = 'two_factor/core/login.html'
+
