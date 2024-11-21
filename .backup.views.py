@@ -2,6 +2,7 @@
 import logging
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, update_session_auth_hash
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -16,11 +17,11 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.views import PasswordResetView, LoginView
+from django.contrib.auth.views import PasswordResetView
 from ratelimit.decorators import ratelimit
-from .models import Product, Order, EmailVerificationToken, CustomUser
+from .models import Product, Order, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
-from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm
+from .forms import UserRegistrationForm, CustomPasswordChangeForm
 
 @login_required
 @sensitive_post_parameters()
