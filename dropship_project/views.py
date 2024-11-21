@@ -1,4 +1,3 @@
-
 import logging
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, update_session_auth_hash
@@ -18,9 +17,12 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import PasswordResetView, LoginView
 from django_ratelimit.decorators import ratelimit
-from .models import Product, Order, EmailVerificationToken, CustomUser
+
+from .models import Product, Order, CustomUser
 from .serializers import ProductSerializer, OrderSerializer
 from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm, CustomAuthenticationForm
+
+logger = logging.getLogger('dropship')
 
 @login_required
 @sensitive_post_parameters()
@@ -54,8 +56,6 @@ def user_profile(request):
     else:
         form = UserProfileForm(instance=request.user)
     return render(request, 'user_profile.html', {'form': form})
-
-logger = logging.getLogger('dropship')
 
 class RateLimitedLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
@@ -97,6 +97,7 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
+            from .models import EmailVerificationToken
             token = EmailVerificationToken.create_token(user)
             current_site = get_current_site(request)
             subject = 'Activate Your Account'
@@ -119,6 +120,7 @@ def activate_account(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = CustomUser.objects.get(pk=uid)
+        from .models import EmailVerificationToken
         token_obj = EmailVerificationToken.objects.get(user=user, token=token)
     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist, EmailVerificationToken.DoesNotExist):
         user = None
@@ -135,14 +137,10 @@ def activate_account(request, uidb64, token):
         logger.warning(f"Invalid account activation attempt: {uidb64}")
         return render(request, 'registration/activation_invalid.html')
 
-from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
-
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [TokenHasReadWriteScope]
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [TokenHasReadWriteScope]
