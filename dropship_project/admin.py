@@ -1,45 +1,22 @@
 from django.contrib import admin
-from django.urls import path
-from django.shortcuts import render
-from django.db.models import Sum, Count
-from django.utils import timezone
+from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Product, Order, CartItem
 
 class CustomAdminSite(admin.AdminSite):
     site_header = 'Dropship Admin'
     site_title = 'Dropship Admin Portal'
     index_title = 'Welcome to Dropship Admin Portal'
-
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('dashboard/', self.admin_view(self.dashboard_view), name='dashboard'),
-        ]
-        return custom_urls + urls
-
-    def dashboard_view(self, request):
-        # Fetch key metrics
-        total_sales = Order.objects.aggregate(total=Sum('total_price'))['total'] or 0
-        new_users = CustomUser.objects.filter(date_joined__gte=timezone.now() - timezone.timedelta(days=7)).count()
-        pending_orders = Order.objects.filter(status='pending').count()
-
-        # Recent orders
-        recent_orders = Order.objects.order_by('-created_at')[:5]
-
-        context = {
-            'total_sales': total_sales,
-            'new_users': new_users,
-            'pending_orders': pending_orders,
-            'recent_orders': recent_orders,
-        }
-        return render(request, 'admin/dashboard.html', context)
+    login_template = 'admin/login.html'
 
 admin_site = CustomAdminSite(name='customadmin')
 
 @admin.register(CustomUser, site=admin_site)
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'date_joined', 'is_staff')
-    search_fields = ('username', 'email')
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    fieldsets = UserAdmin.fieldsets + (
+        ('Additional Info', {'fields': ('phone_number', 'address')}),
+    )
 
 @admin.register(Product, site=admin_site)
 class ProductAdmin(admin.ModelAdmin):
