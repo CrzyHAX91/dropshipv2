@@ -1,7 +1,10 @@
 from django import forms
-from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm, AuthenticationForm
 from django.contrib.auth import password_validation
 from .models import CustomUser
+
+class CustomAuthenticationForm(AuthenticationForm):
+    remember_me = forms.BooleanField(required=False, initial=False)
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
