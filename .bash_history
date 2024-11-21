@@ -1,375 +1,383 @@
-class RateLimitedLoginView(LoginView):
-    authentication_form = CustomAuthenticationForm
+pip install django-password-validation
+echo "Installed django-password-validation"
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+cat << EOF > /home/user/dropship_project/forms.py
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from .models import CustomUser
 
-    @method_decorator(ratelimit(key='ip', rate='5/m', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
 
-    def form_valid(self, form):
-        remember_me = form.cleaned_data.get('remember_me')
-        if not remember_me:
-            # Set session expiry to 0 seconds. So it will automatically close the session after the browser is closed.
-            self.request.session.set_expiry(0)
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'password1', 'password2')
 
-        logger.info(f"Successful login for user: {form.get_user()}")
-        return super().form_valid(form)
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        try:
+            validate_password(password1, self.instance)
+        except ValidationError as error:
+            self.add_error('password1', error)
+        return password1
 
-    def form_invalid(self, form):
-        logger.warning(f"Failed login attempt for username: {form.data.get('username')}")
-        return super().form_invalid(form)
+class CustomAuthenticationForm(AuthenticationForm):
+    remember_me = forms.BooleanField(required=False, initial=False)
 
-class RateLimitedPasswordResetView(PasswordResetView):
-    @method_decorator(ratelimit(key='ip', rate='3/h', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'first_name', 'last_name')
 
-    def form_valid(self, form):
-        logger.info(f"Password reset requested for email: {form.cleaned_data['email']}")
-        return super().form_valid(form)
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if CustomUser.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('This email address is already in use.')
+        return email
 
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-@ratelimit(key='ip', rate='5/h', method=['GET', 'POST'])
-def register(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-            from .models import EmailVerificationToken
-            token = EmailVerificationToken.create_token(user)
-            current_site = get_current_site(request)
-            subject = 'Activate Your Account'
-            message = render_to_string('emails/account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': token.token,
-            })
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            logger.info(f"New user registered: {user.username}")
-            return render(request, 'registration/registration_done.html')
-        else:
-            logger.warning(f"Failed registration attempt: {form.errors}")
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'registration/register.html', {'form': form})
-
-def activate_account(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = CustomUser.objects.get(pk=uid)
-        from .models import EmailVerificationToken
-        token_obj = EmailVerificationToken.objects.get(user=user, token=token)
-    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist, EmailVerificationToken.DoesNotExist):
-        user = None
-        token_obj = None
-
-    if user is not None and token_obj is not None:
-        user.is_active = True
-        user.save()
-        token_obj.delete()
-        login(request, user)
-        logger.info(f"User account activated: {user.username}")
-        return redirect('home')
-    else:
-        logger.warning(f"Invalid account activation attempt: {uidb64}")
-        return render(request, 'registration/activation_invalid.html')
-
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
 EOF
 
-echo "Updated views.py file"
+echo "Updated forms.py with password validation in UserRegistrationForm"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
-python3 /home/user/dropship_project/manage.py check -v 2
+cat << EOF > /home/user/dropship_project/templates/registration/register.html
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h2>{% trans "Register" %}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% trans "Register" %}</button>
+</form>
+
+<div class="password-requirements mt-3">
+    <h4>{% trans "Password Requirements:" %}</h4>
+    <ul>
+        <li>{% trans "Minimum length: 10 characters" %}</li>
+        <li>{% trans "At least 5 unique characters" %}</li>
+        <li>{% trans "At least 1 lowercase letter" %}</li>
+        <li>{% trans "At least 1 uppercase letter" %}</li>
+        <li>{% trans "At least 1 number" %}</li>
+        <li>{% trans "At least 1 special character" %}</li>
+    </ul>
+</div>
+
+<p>{% trans "Already have an account?" %} <a href="{% url 'account_login' %}">{% trans "Log in" %}</a></p>
+{% endblock %}
+EOF
+
+echo "Created/Updated registration template with password requirements"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
-pip install django-recaptcha
-{ echo $?; } 2>/dev/null
-import os
-os.environ["JUPYTER_PWD"] = "/home/user/"
-{ echo $?; } 2>/dev/null
-grep -A 20 "INSTALLED_APPS = \[" /home/user/dropship_project/settings.py
-{ echo $?; } 2>/dev/null
-import os
-os.environ["JUPYTER_PWD"] = "/home/user/"
-{ echo $?; } 2>/dev/null
-sed -i "s/'captcha',/'django_recaptcha',/" /home/user/dropship_project/settings.py
-echo "Updated INSTALLED_APPS in settings.py"
-grep -A 20 "INSTALLED_APPS = \[" /home/user/dropship_project/settings.py
-{ echo $?; } 2>/dev/null
-import os
-os.environ["JUPYTER_PWD"] = "/home/user/"
-{ echo $?; } 2>/dev/null
-git status
-{ echo $?; } 2>/dev/null
-import os
-os.environ["JUPYTER_PWD"] = "/home/user/"
-{ echo $?; } 2>/dev/null
-git push origin local_changes
+cat << EOF > /home/user/dropship_project/templates/base.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dropship V2{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #password-strength-meter {
+            height: 5px;
+            width: 0;
+            transition: width 0.3s, background-color 0.3s;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Dropship V2</a>
+        <div class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <a class="nav-item nav-link" href="{% url 'user_profile' %}">Profile</a>
+                <a class="nav-item nav-link" href="{% url 'account_logout' %}">Logout</a>
+            {% else %}
+                <a class="nav-item nav-link" href="{% url 'account_login' %}">Login</a>
+                <a class="nav-item nav-link" href="{% url 'account_signup' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/js/password_strength.js"></script>
+</body>
+</html>
+EOF
+
+echo "Updated base.html with password strength meter styles and JavaScript"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
 cat << EOF >> /home/user/dropship_project/settings.py
 
-# Logging configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'dropship.log',
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'dropship': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 EOF
 
-echo "Updated logging configuration in settings.py"
+echo "Updated settings.py with static files configuration"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
-cat << EOF > /home/user/dropship_project/views.py
-import logging
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, update_session_auth_hash
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
-from django.conf import settings
-from django.contrib import messages
-from rest_framework import viewsets
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.debug import sensitive_post_parameters
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.views import PasswordResetView, LoginView
-from django_ratelimit.decorators import ratelimit
+pip install sendgrid
+echo "Installed SendGrid library"
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+cat << EOF >> /home/user/dropship_project/settings.py
 
-from .models import Product, Order, CustomUser, EmailVerificationToken
-from .serializers import ProductSerializer, OrderSerializer
-from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm, CustomAuthenticationForm
-
-logger = logging.getLogger('dropship')
-
-@login_required
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def change_password(request):
-    if request.method == 'POST':
-        form = CustomPasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            logger.info(f"Password changed successfully for user: {user.username}")
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
-        else:
-            logger.warning(f"Failed password change attempt for user: {request.user.username}")
-            messages.error(request, 'Please correct the error below.')
-    else:
-        form = CustomPasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {'form': form})
-
-@login_required
-def user_profile(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            logger.info(f"Profile updated for user: {request.user.username}")
-            messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('user_profile')
-        else:
-            logger.warning(f"Failed profile update attempt for user: {request.user.username}")
-    else:
-        form = UserProfileForm(instance=request.user)
-    return render(request, 'user_profile.html', {'form': form})
-
-class RateLimitedLoginView(LoginView):
-    authentication_form = CustomAuthenticationForm
-
-    @method_decorator(ratelimit(key='ip', rate='5/m', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        remember_me = form.cleaned_data.get('remember_me')
-        if not remember_me:
-            self.request.session.set_expiry(0)
-        logger.info(f"Successful login for user: {form.get_user().username}")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(f"Failed login attempt for username: {form.data.get('username')}")
-        return super().form_invalid(form)
-
-class RateLimitedPasswordResetView(PasswordResetView):
-    @method_decorator(ratelimit(key='ip', rate='3/h', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        logger.info(f"Password reset requested for email: {form.cleaned_data['email']}")
-        return super().form_valid(form)
-
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-@ratelimit(key='ip', rate='5/h', method=['GET', 'POST'])
-def register(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-            token = EmailVerificationToken.create_token(user)
-            current_site = get_current_site(request)
-            subject = 'Activate Your Account'
-            message = render_to_string('emails/account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': token.token,
-            })
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            logger.info(f"New user registered: {user.username}")
-            return render(request, 'registration/registration_done.html')
-        else:
-            logger.warning(f"Failed registration attempt: {form.errors}")
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'registration/register.html', {'form': form})
-
-def activate_account(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = CustomUser.objects.get(pk=uid)
-        token_obj = EmailVerificationToken.objects.get(user=user, token=token)
-    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist, EmailVerificationToken.DoesNotExist):
-        user = None
-        token_obj = None
-
-    if user is not None and token_obj is not None:
-        user.is_active = True
-        user.save()
-        token_obj.delete()
-        login(request, user)
-        logger.info(f"User account activated: {user.username}")
-        return redirect('home')
-    else:
-        logger.warning(f"Invalid account activation attempt: {uidb64}")
-        return render(request, 'registration/activation_invalid.html')
-
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+# Email configuration
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'  # Replace with your domain
+SENDGRID_SANDBOX_MODE_IN_DEBUG = True
 
 EOF
 
-echo "Updated views.py with logging statements"
+echo "Updated settings.py with SendGrid configuration"
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+cat << EOF >> /home/user/dropship_project/settings.py
+
+# django-allauth configuration
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+INSTALLED_APPS += [
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+]
+
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+            'locale',
+            'timezone',
+            'link',
+            'gender',
+            'updated_time',
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': lambda request: 'en_US',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v7.0',
+    }
+}
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+EOF
+
+echo "Updated settings.py with django-allauth configuration"
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+cat << EOF > /home/user/dropship_project/urls.py
+from django.contrib import admin
+from django.urls import path, include
+from django.views.generic import TemplateView
+from .views import CustomLoginView, register, activate_account, user_profile
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('accounts/', include('allauth.urls')),
+    path('login/', CustomLoginView.as_view(), name='account_login'),
+    path('register/', register, name='account_signup'),
+    path('activate/<str:uidb64>/<str:token>/', activate_account, name='activate_account'),
+    path('profile/', user_profile, name='user_profile'),
+]
+
+EOF
+
+echo "Updated urls.py with allauth URLs"
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+mkdir -p /home/user/dropship_project/templates/admin
+echo "Created custom admin templates directory"
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+pwd
+{ echo $?; } 2>/dev/null
+import os
+os.environ["JUPYTER_PWD"] = "/home/user/"
+{ echo $?; } 2>/dev/null
+cat << EOF > /home/user/dropship_project/templates/admin/login.html
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    #login-form {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .login-header h1 {
+        color: #007bff;
+    }
+    .form-row {
+        margin-bottom: 20px;
+    }
+    .submit-row {
+        text-align: center;
+    }
+    .submit-row input {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .submit-row input:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="login-form">
+    <div class="login-header">
+        <h1>{% trans 'Dropship Admin' %}</h1>
+    </div>
+    {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+        {% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+    <p class="errornote">
+        {{ error }}
+    </p>
+    {% endfor %}
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+        <div class="form-row">
+            {{ form.username.errors }}
+            {{ form.username.label_tag }} {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.errors }}
+            {{ form.password.label_tag }} {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}" />
+        </div>
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+        <div class="password-reset-link">
+            <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+        </div>
+        {% endif %}
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Log in' %}">
+        </div>
+    </form>
+</div>
+{% endblock %}
+EOF
+
+echo "Created custom admin login template"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
 cat << EOF > /home/user/dropship_project/admin.py
 from django.contrib import admin
-from django.urls import path
-from django.shortcuts import render
-from django.db.models import Sum, Count
-from django.utils import timezone
+from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Product, Order, CartItem
 
 class CustomAdminSite(admin.AdminSite):
     site_header = 'Dropship Admin'
     site_title = 'Dropship Admin Portal'
     index_title = 'Welcome to Dropship Admin Portal'
-
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('dashboard/', self.admin_view(self.dashboard_view), name='dashboard'),
-        ]
-        return custom_urls + urls
-
-    def dashboard_view(self, request):
-        # Fetch key metrics
-        total_sales = Order.objects.aggregate(total=Sum('total_price'))['total'] or 0
-        new_users = CustomUser.objects.filter(date_joined__gte=timezone.now() - timezone.timedelta(days=7)).count()
-        pending_orders = Order.objects.filter(status='pending').count()
-
-        # Recent orders
-        recent_orders = Order.objects.order_by('-created_at')[:5]
-
-        context = {
-            'total_sales': total_sales,
-            'new_users': new_users,
-            'pending_orders': pending_orders,
-            'recent_orders': recent_orders,
-        }
-        return render(request, 'admin/dashboard.html', context)
+    login_template = 'admin/login.html'
 
 admin_site = CustomAdminSite(name='customadmin')
 
 @admin.register(CustomUser, site=admin_site)
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'date_joined', 'is_staff')
-    search_fields = ('username', 'email')
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    fieldsets = UserAdmin.fieldsets + (
+        ('Additional Info', {'fields': ('phone_number', 'address')}),
+    )
 
 @admin.register(Product, site=admin_site)
 class ProductAdmin(admin.ModelAdmin):
@@ -390,110 +398,102 @@ class CartItemAdmin(admin.ModelAdmin):
 
 EOF
 
-echo "Created custom admin.py"
+echo "Updated admin.py with custom AdminSite class"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
-mkdir -p /home/user/dropship_project/templates/admin
-echo "Created admin templates directory"
+cat << EOF > /home/user/dropship_project/urls.py
+from django.urls import path, include
+from django.contrib.auth import views as auth_views
+from rest_framework.routers import DefaultRouter
+from two_factor.urls import urlpatterns as tf_urls
+from .views import ProductViewSet, OrderViewSet, register, activate_account, RateLimitedPasswordResetView, user_profile, CustomLoginView
+from .admin import admin_site
+
+router = DefaultRouter()
+router.register(r'products', ProductViewSet)
+router.register(r'orders', OrderViewSet)
+
+urlpatterns = [
+    path('', include(tf_urls)),
+    path('admin/', admin_site.urls),
+    path('', include(router.urls)),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('register/', register, name='register'),
+    path('activate/<str:uidb64>/<str:token>/', activate_account, name='activate_account'),
+    path('password_reset/', RateLimitedPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('profile/', user_profile, name='user_profile'),
+    path('accounts/', include('allauth.urls')),
+]
+
+EOF
+
+echo "Updated urls.py to use custom admin site"
 { echo $?; } 2>/dev/null
 import os
 os.environ["JUPYTER_PWD"] = "/home/user/"
 { echo $?; } 2>/dev/null
-pwd
-{ echo $?; } 2>/dev/null
-import os
-os.environ["JUPYTER_PWD"] = "/home/user/"
-{ echo $?; } 2>/dev/null
-cat << EOF > /home/user/dropship_project/templates/admin/dashboard.html
+cat << EOF > /home/user/dropship_project/templates/admin/index.html
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}
+{% block extrastyle %}
+{{ block.super }}
 <style>
     .dashboard-container {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
+        margin-top: 20px;
     }
     .dashboard-card {
         flex-basis: calc(50% - 20px);
         margin-bottom: 20px;
         padding: 20px;
-        background-color: #f8f9fa;
+        background-color: #fff;
         border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .dashboard-card h2 {
+        color: #007bff;
         margin-top: 0;
-        color: #333;
     }
-    .metric {
+    .dashboard-card p {
         font-size: 24px;
         font-weight: bold;
-        color: #007bff;
-    }
-    .recent-orders {
-        margin-top: 20px;
-    }
-    .recent-orders table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .recent-orders th, .recent-orders td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        text-align: left;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="dashboard-card">
-        <h2>Total Sales</h2>
-        <p class="metric">${{ total_sales|floatformat:2 }}</p>
+<div id="content-main">
+    <h1>{% trans 'Dropship Admin Dashboard' %}</h1>
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h2>{% trans 'Total Users' %}</h2>
+            <p>{{ user_count }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h2>{% trans 'Total Products' %}</h2>
+            <p>{{ product_count }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h2>{% trans 'Total Orders' %}</h2>
+            <p>{{ order_count }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h2>{% trans 'Recent Orders' %}</h2>
+            <ul>
+                {% for order in recent_orders %}
+                    <li>Order #{{ order.id }} - {{ order.user.username }} - ${{ order.total_price }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-    <div class="dashboard-card">
-        <h2>New Users (Last 7 Days)</h2>
-        <p class="metric">{{ new_users }}</p>
-    </div>
-    <div class="dashboard-card">
-        <h2>Pending Orders</h2>
-        <p class="metric">{{ pending_orders }}</p>
-    </div>
-    <div class="dashboard-card">
-        <h2>Quick Actions</h2>
-        <p><a href="{% url 'admin:dropship_project_product_add' %}" class="button">Add New Product</a></p>
-        <p><a href="{% url 'admin:dropship_project_order_changelist' %}?status__exact=pending" class="button">View Pending Orders</a></p>
-    </div>
-</div>
-
-<div class="recent-orders">
-    <h2>Recent Orders</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Total Price</th>
-                <th>Status</th>
-                <th>Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in recent_orders %}
-            <tr>
-                <td><a href="{% url 'admin:dropship_project_order_change' order.id %}">{{ order.id }}</a></td>
-                <td>{{ order.user.username }}</td>
-                <td>${{ order.total_price|floatformat:2 }}</td>
-                <td>{{ order.status }}</td>
-                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 {% endblock %}
 EOF
