@@ -351,3 +351,19 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
+
+# Custom admin settings
+TEMPLATES[0]['DIRS'] += [BASE_DIR / 'templates']
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Admin site configuration
+ADMIN_SITE_HEADER = "Dropship Admin"
+ADMIN_SITE_TITLE = "Dropship Admin Portal"
+ADMIN_INDEX_TITLE = "Welcome to Dropship Admin Portal"
+
