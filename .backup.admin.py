@@ -1,12 +1,6 @@
 
-import csv
 from django.contrib import admin
-from django.http import HttpResponse
 from .models import Category, Product, Order, CartItem
-
-class CartItemInline(admin.TabularInline):
-    model = CartItem
-    extra = 0
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
