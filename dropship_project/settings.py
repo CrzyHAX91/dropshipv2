@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.twitter',
     'allauth.socialaccount.providers.github',
     'axes',
-    'captcha',
+    'django_recaptcha',
 ]
 
 REST_FRAMEWORK = {
