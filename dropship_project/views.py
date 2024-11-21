@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import PasswordResetView, LoginView
 from django_ratelimit.decorators import ratelimit
 
-from .models import Product, Order, CustomUser
+from .models import Product, Order, CustomUser, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
 from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm, CustomAuthenticationForm
 
@@ -33,16 +33,16 @@ def change_password(request):
         form = CustomPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Important!
+            update_session_auth_hash(request, user)
+            logger.info(f"Password changed successfully for user: {user.username}")
             messages.success(request, 'Your password was successfully updated!')
             return redirect('change_password')
         else:
+            logger.warning(f"Failed password change attempt for user: {request.user.username}")
             messages.error(request, 'Please correct the error below.')
     else:
         form = CustomPasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {
-        'form': form
-    })
+    return render(request, 'change_password.html', {'form': form})
 
 @login_required
 def user_profile(request):
@@ -50,9 +50,11 @@ def user_profile(request):
         form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            logger.info(f"User profile updated: {request.user.username}")
+            logger.info(f"Profile updated for user: {request.user.username}")
             messages.success(request, 'Your profile has been updated successfully.')
             return redirect('user_profile')
+        else:
+            logger.warning(f"Failed profile update attempt for user: {request.user.username}")
     else:
         form = UserProfileForm(instance=request.user)
     return render(request, 'user_profile.html', {'form': form})
@@ -67,10 +69,8 @@ class RateLimitedLoginView(LoginView):
     def form_valid(self, form):
         remember_me = form.cleaned_data.get('remember_me')
         if not remember_me:
-            # Set session expiry to 0 seconds. So it will automatically close the session after the browser is closed.
             self.request.session.set_expiry(0)
-
-        logger.info(f"Successful login for user: {form.get_user()}")
+        logger.info(f"Successful login for user: {form.get_user().username}")
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -97,7 +97,6 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-            from .models import EmailVerificationToken
             token = EmailVerificationToken.create_token(user)
             current_site = get_current_site(request)
             subject = 'Activate Your Account'
@@ -120,7 +119,6 @@ def activate_account(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = CustomUser.objects.get(pk=uid)
-        from .models import EmailVerificationToken
         token_obj = EmailVerificationToken.objects.get(user=user, token=token)
     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist, EmailVerificationToken.DoesNotExist):
         user = None
@@ -144,3 +142,4 @@ class ProductViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
