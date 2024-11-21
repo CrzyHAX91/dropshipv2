@@ -29,27 +29,16 @@ class RateLimitedLoginView(LoginView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-    def form_valid(self, form):
-        logger.info(f"Successful login for user: {form.get_user()}")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(f"Failed login attempt for username: {form.data.get('username')}")
-        return super().form_invalid(form)
-
 class RateLimitedPasswordResetView(PasswordResetView):
     @method_decorator(ratelimit(key='ip', rate='3/h', method=['GET', 'POST']))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-    def form_valid(self, form):
-        logger.info(f"Password reset requested for email: {form.cleaned_data['email']}")
-        return super().form_valid(form)
-
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
 @ratelimit(key='ip', rate='5/h', method=['GET', 'POST'])
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -67,10 +56,7 @@ def register(request):
                 'token': token.token,
             })
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            logger.info(f"New user registered: {user.username}")
             return render(request, 'registration/registration_done.html')
-        else:
-            logger.warning(f"Failed registration attempt: {form.errors}")
     else:
         form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -89,10 +75,8 @@ def activate_account(request, uidb64, token):
         user.save()
         token_obj.delete()
         login(request, user)
-        logger.info(f"User account activated: {user.username}")
         return redirect('home')
     else:
-        logger.warning(f"Invalid account activation attempt: {uidb64}")
         return render(request, 'registration/activation_invalid.html')
 
 class ProductViewSet(viewsets.ModelViewSet):
