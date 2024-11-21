@@ -1,7 +1,7 @@
 
 import logging
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, update_session_auth_hash
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -17,31 +17,11 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import LoginView, PasswordResetView
 from ratelimit.decorators import ratelimit
 from .models import Product, Order, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
-from .forms import UserRegistrationForm, CustomPasswordChangeForm
-
-@login_required
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def change_password(request):
-    if request.method == 'POST':
-        form = CustomPasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
-        else:
-            messages.error(request, 'Please correct the error below.')
-    else:
-        form = CustomPasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {
-        'form': form
-    })
+from .forms import UserRegistrationForm, UserProfileForm
 
 @login_required
 def user_profile(request):
