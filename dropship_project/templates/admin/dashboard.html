@@ -1,89 +1,42 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}
+{% block extrastyle %}
+{{ block.super }}
 <style>
     .dashboard-container {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
     }
-    .dashboard-card {
-        flex-basis: calc(50% - 20px);
+    .dashboard-widget {
+        flex-basis: calc(33% - 20px);
         margin-bottom: 20px;
         padding: 20px;
-        background-color: #f8f9fa;
+        background-color: #fff;
         border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .dashboard-card h2 {
-        margin-top: 0;
-        color: #333;
-    }
-    .metric {
-        font-size: 24px;
-        font-weight: bold;
+    .dashboard-widget h2 {
         color: #007bff;
-    }
-    .recent-orders {
-        margin-top: 20px;
-    }
-    .recent-orders table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .recent-orders th, .recent-orders td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        text-align: left;
+        margin-top: 0;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="dashboard-card">
-        <h2>Total Sales</h2>
-        <p class="metric">${{ total_sales|floatformat:2 }}</p>
+<div id="content-main">
+    <h1>{% trans 'Dashboard' %}</h1>
+    <div class="dashboard-container">
+        <div class="dashboard-widget">
+            {% include "admin/widgets/quick_links.html" with widget=quick_links %}
+        </div>
+        <div class="dashboard-widget">
+            {% include "admin/widgets/recent_orders.html" with widget=recent_orders %}
+        </div>
+        <div class="dashboard-widget">
+            {% include "admin/widgets/sales_statistics.html" with widget=sales_statistics %}
+        </div>
     </div>
-    <div class="dashboard-card">
-        <h2>New Users (Last 7 Days)</h2>
-        <p class="metric">{{ new_users }}</p>
-    </div>
-    <div class="dashboard-card">
-        <h2>Pending Orders</h2>
-        <p class="metric">{{ pending_orders }}</p>
-    </div>
-    <div class="dashboard-card">
-        <h2>Quick Actions</h2>
-        <p><a href="{% url 'admin:dropship_project_product_add' %}" class="button">Add New Product</a></p>
-        <p><a href="{% url 'admin:dropship_project_order_changelist' %}?status__exact=pending" class="button">View Pending Orders</a></p>
-    </div>
-</div>
-
-<div class="recent-orders">
-    <h2>Recent Orders</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Total Price</th>
-                <th>Status</th>
-                <th>Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in recent_orders %}
-            <tr>
-                <td><a href="{% url 'admin:dropship_project_order_change' order.id %}">{{ order.id }}</a></td>
-                <td>{{ order.user.username }}</td>
-                <td>${{ order.total_price|floatformat:2 }}</td>
-                <td>{{ order.status }}</td>
-                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 {% endblock %}
