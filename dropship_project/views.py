@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import PasswordResetView, LoginView
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 from .models import Product, Order, EmailVerificationToken, CustomUser
 from .serializers import ProductSerializer, OrderSerializer
 from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm, CustomAuthenticationForm
