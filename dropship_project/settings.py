@@ -21,6 +21,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 INSTALLED_APPS = [
+    'django_recaptcha',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -30,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'oauth2_provider',
-    'dropship_project.api',
+    'dropship_project',
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
@@ -43,7 +44,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.twitter',
     'allauth.socialaccount.providers.github',
     'axes',
-    'captcha',
+    'django_recaptcha',
 ]
 
 REST_FRAMEWORK = {
@@ -193,3 +194,16 @@ LOGGING = {
     },
 }
 # Test change
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'axes.middleware.AxesMiddleware',
+]
+

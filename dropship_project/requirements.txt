@@ -23,7 +23,6 @@ charset-normalizer
 click
 comm
 cryptography
-dbus-python
 debugpy
 decorator
 defusedxml
