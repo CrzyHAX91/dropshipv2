@@ -44,3 +44,16 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
 
+
+from django.utils.crypto import get_random_string
+
+class EmailVerificationToken(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def create_token(cls, user):
+        token = get_random_string(64)
+        return cls.objects.create(user=user, token=token)
+
