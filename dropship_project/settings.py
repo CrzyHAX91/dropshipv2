@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'oauth2_provider',
-    'dropship_project.api',
+    'dropship_project',
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
