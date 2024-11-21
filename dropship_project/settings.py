@@ -260,3 +260,21 @@ SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'  # Replace with your domain
 SENDGRID_SANDBOX_MODE_IN_DEBUG = True  # Set to False in production
 
+
+# Two-factor authentication settings
+INSTALLED_APPS += [
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
+]
+
+MIDDLEWARE += [
+    'django_otp.middleware.OTPMiddleware',
+]
+
+LOGIN_URL = 'two_factor:login'
+LOGIN_REDIRECT_URL = 'two_factor:profile'
+
+TWO_FACTOR_PATCH_ADMIN = True
+
