@@ -34,11 +34,10 @@ class UserProfileForm(forms.ModelForm):
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2', 'captcha')
+        fields = ('username', 'email', 'password1', 'password2')
 
     def save(self, commit=True):
         user = super(UserRegistrationForm, self).save(commit=False)
