@@ -1,29 +1,19 @@
-
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import password_validation
 
-class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['old_password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Current Password'})
+        self.fields['new_password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'New Password'})
+        self.fields['new_password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm New Password'})
 
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
+    def clean_new_password1(self):
+        password1 = self.cleaned_data.get('new_password1')
+        try:
+            password_validation.validate_password(password1, self.user)
+        except forms.ValidationError as error:
+            self.add_error('new_password1', error)
+        return password1
 
-    def save(self, commit=True):
-        user = super(UserRegistrationForm, self).save(commit=False)
-        user.email = self.cleaned_data['email']
-        if commit:
-            user.save()
-        return user
-
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'first_name', 'last_name')
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError('This email address is already in use.')
-        return email
