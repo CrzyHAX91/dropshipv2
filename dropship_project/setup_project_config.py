@@ -1,6 +1,3 @@
-
-import os
-
 # Create settings.py
 settings_content = '''
 import os
