@@ -286,3 +286,10 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+
+# Email configuration
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'  # Replace with your domain
+SENDGRID_SANDBOX_MODE_IN_DEBUG = True
+
