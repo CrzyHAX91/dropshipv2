@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'rest_framework',
-    'oauth2_provider',
     'dropship_project.api',
     'django_otp',
     'django_otp.plugins.otp_static',
@@ -43,22 +42,37 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.twitter',
     'allauth.socialaccount.providers.github',
     'axes',
-    'captcha',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    )
-}
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
+]
 
-OAUTH2_PROVIDER = {
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope'}
-}
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_COOLOFF_TIME = 1  # 1 hour
+
+# reCAPTCHA settings
+RECAPTCHA_PUBLIC_KEY = 'your_recaptcha_public_key'
+RECAPTCHA_PRIVATE_KEY = 'your_recaptcha_private_key'
+RECAPTCHA_REQUIRED_SCORE = 0.85
+
+INSTALLED_APPS += [
+    'captcha',
+]
 
 # Two-factor authentication settings
 LOGIN_URL = 'two_factor:login'
