@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count
 from .models import CustomUser, Product, Order, CartItem
 
 class CustomAdminSite(admin.AdminSite):
@@ -7,6 +8,15 @@ class CustomAdminSite(admin.AdminSite):
     site_title = 'Dropship Admin Portal'
     index_title = 'Welcome to Dropship Admin Portal'
     login_template = 'admin/login.html'
+    index_template = 'admin/index.html'
+
+    def index(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['user_count'] = CustomUser.objects.count()
+        extra_context['product_count'] = Product.objects.count()
+        extra_context['order_count'] = Order.objects.count()
+        extra_context['recent_orders'] = Order.objects.order_by('-created_at')[:5]
+        return super().index(request, extra_context)
 
 admin_site = CustomAdminSite(name='customadmin')
 
