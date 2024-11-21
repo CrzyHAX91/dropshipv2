@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count, F
 from django.utils import timezone
+from django.urls import path
+from django.shortcuts import render
 from .models import CustomUser, Product, Order, CartItem
+import json
 
 class CustomAdminSite(admin.AdminSite):
     site_header = 'Dropship Admin'
@@ -11,6 +14,13 @@ class CustomAdminSite(admin.AdminSite):
     login_template = 'admin/login.html'
     index_template = 'admin/index.html'
 
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('order-stats/', self.admin_view(self.order_stats_view), name='order_stats'),
+        ]
+        return custom_urls + urls
+
     def index(self, request, extra_context=None):
         extra_context = extra_context or {}
         extra_context['user_count'] = CustomUser.objects.count()
@@ -18,6 +28,25 @@ class CustomAdminSite(admin.AdminSite):
         extra_context['order_count'] = Order.objects.count()
         extra_context['recent_orders'] = Order.objects.order_by('-created_at')[:5]
         return super().index(request, extra_context)
+
+    def order_stats_view(self, request):
+        # Get order counts for the last 7 days
+        end_date = timezone.now().date()
+        start_date = end_date - timezone.timedelta(days=6)
+        order_data = Order.objects.filter(created_at__date__range=[start_date, end_date])             .values('created_at__date')             .annotate(count=Count('id'))             .order_by('created_at__date')
+
+        labels = [(start_date + timezone.timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
+        data = [0] * 7
+
+        for item in order_data:
+            index = (item['created_at__date'] - start_date).days
+            data[index] = item['count']
+
+        context = {
+            'labels': json.dumps(labels),
+            'data': json.dumps(data),
+        }
+        return render(request, 'admin/order_stats.html', context)
 
 admin_site = CustomAdminSite(name='customadmin')
 
