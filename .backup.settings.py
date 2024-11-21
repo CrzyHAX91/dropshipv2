@@ -65,15 +65,6 @@ AXES_FAILURE_LIMIT = 5
 AXES_LOCK_OUT_AT_FAILURE = True
 AXES_COOLOFF_TIME = 1  # 1 hour
 
-# reCAPTCHA settings
-RECAPTCHA_PUBLIC_KEY = 'your_recaptcha_public_key'
-RECAPTCHA_PRIVATE_KEY = 'your_recaptcha_private_key'
-RECAPTCHA_REQUIRED_SCORE = 0.85
-
-INSTALLED_APPS += [
-    'captcha',
-]
-
 # Two-factor authentication settings
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = 'two_factor:profile'
