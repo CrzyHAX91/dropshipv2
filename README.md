@@ -16,12 +16,13 @@ Dropship V2 is a Django-based e-commerce platform for dropshipping. It includes 
 
 ## Technology Stack
 
-- Backend: Django (Python)
+- Backend: Django 5.1.3
 - Database: PostgreSQL
 - Frontend: HTML, CSS (Bootstrap), JavaScript
-- Authentication: django-allauth, django-two-factor-auth
-- API: Django REST framework with OAuth2
-- Task Queue: Celery (for background tasks)
+- Authentication: django-allauth 65.2.0, django-two-factor-auth
+- API: Django REST framework 3.15.2
+- Security: django-axes 7.0.0
+- OAuth2: django-oauth-toolkit 3.0.1
 
 ## Setup
 
@@ -39,3 +40,4 @@ Please read CONTRIBUTING.md for details on our code of conduct, and the process 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
