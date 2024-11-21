@@ -16,24 +16,11 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import LoginView, PasswordResetView
 from ratelimit.decorators import ratelimit
 from .models import Product, Order, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
-from .forms import UserRegistrationForm, UserProfileForm
-
-@login_required
-def user_profile(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            logger.info(f"User profile updated: {request.user.username}")
-            messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('user_profile')
-    else:
-        form = UserProfileForm(instance=request.user)
-    return render(request, 'user_profile.html', {'form': form})
+from .forms import UserRegistrationForm
 
 logger = logging.getLogger('dropship')
 
