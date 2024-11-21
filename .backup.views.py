@@ -9,32 +9,9 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework import viewsets
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.debug import sensitive_post_parameters
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.views import LoginView, PasswordResetView
-from ratelimit.decorators import ratelimit
 from .models import Product, Order, EmailVerificationToken
 from .serializers import ProductSerializer, OrderSerializer
 from .forms import UserRegistrationForm
-
-class RateLimitedLoginView(LoginView):
-    @method_decorator(ratelimit(key='ip', rate='5/m', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-class RateLimitedPasswordResetView(PasswordResetView):
-    @method_decorator(ratelimit(key='ip', rate='3/h', method=['GET', 'POST']))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-@ratelimit(key='ip', rate='5/h', method=['GET', 'POST'])
 
 def register(request):
     if request.method == 'POST':
