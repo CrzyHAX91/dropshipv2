@@ -88,7 +88,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Stripe settings
 STRIPE_PUBLIC_KEY = 'your-stripe-public-key'
 STRIPE_SECRET_KEY = 'your-stripe-secret-key'
-
-# Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@example.com'
