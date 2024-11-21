@@ -20,7 +20,7 @@ from django.contrib.auth.views import PasswordResetView, LoginView
 from ratelimit.decorators import ratelimit
 from .models import Product, Order, EmailVerificationToken, CustomUser
 from .serializers import ProductSerializer, OrderSerializer
-from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm, CustomAuthenticationForm
+from .forms import UserRegistrationForm, CustomPasswordChangeForm, UserProfileForm
 
 @login_required
 @sensitive_post_parameters()
