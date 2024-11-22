@@ -1,47 +1,94 @@
-
-import csv
 from django.contrib import admin
-from django.http import HttpResponse
-from .models import Category, Product, Order, CartItem
+from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count, F
+from django.utils import timezone
+from django.urls import path
+from django.shortcuts import render
+from .models import CustomUser, Product, Order, CartItem
+from .admin_filters import DateRangeFilter
+from .admin_widgets import QuickLinksWidget, RecentOrdersWidget, SalesStatisticsWidget
+import json
 
-class CartItemInline(admin.TabularInline):
-    model = CartItem
-    extra = 0
+class CustomAdminSite(admin.AdminSite):
+    site_header = 'Dropship Admin'
+    site_title = 'Dropship Admin Portal'
+    index_title = 'Welcome to Dropship Admin Portal'
+    login_template = 'admin/login.html'
+    index_template = 'admin/dashboard.html'
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
-    prepopulated_fields = {'slug': ('name',)}
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('order-stats/', self.admin_view(self.order_stats_view), name='order_stats'),
+        ]
+        return custom_urls + urls
 
-@admin.register(Product)
+    def index(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['quick_links'] = QuickLinksWidget()
+        extra_context['recent_orders'] = RecentOrdersWidget()
+        extra_context['sales_statistics'] = SalesStatisticsWidget()
+        return super().index(request, extra_context)
+
+    def order_stats_view(self, request):
+        end_date = timezone.now().date()
+        start_date = end_date - timezone.timedelta(days=6)
+        order_data = Order.objects.filter(created_at__date__range=[start_date, end_date])             .values('created_at__date')             .annotate(count=Count('id'))             .order_by('created_at__date')
+
+        labels = [(start_date + timezone.timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
+        data = [0] * 7
+
+        for item in order_data:
+            index = (item['created_at__date'] - start_date).days
+            data[index] = item['count']
+
+        context = {
+            'labels': json.dumps(labels),
+            'data': json.dumps(data),
+        }
+        return render(request, 'admin/order_stats.html', context)
+
+admin_site = CustomAdminSite(name='customadmin')
+
+@admin.register(CustomUser, site=admin_site)
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    fieldsets = UserAdmin.fieldsets + (
+        ('Additional Info', {'fields': ('phone_number', 'address')}),
+    )
+
+@admin.register(Product, site=admin_site)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'cost_price', 'selling_price', 'profit_margin')
-    list_filter = ('category', 'name')
+    list_display = ('name', 'price', 'stock', 'category')
+    list_filter = ('category',)
     search_fields = ('name', 'description')
+    actions = ['increase_stock', 'decrease_stock']
 
-@admin.register(CartItem)
+    def increase_stock(self, request, queryset):
+        updated = queryset.update(stock=F('stock') + 10)
+        self.message_user(request, f'Successfully increased stock for {updated} products.')
+    increase_stock.short_description = "Increase stock by 10"
+
+    def decrease_stock(self, request, queryset):
+        updated = queryset.update(stock=F('stock') - 10)
+        self.message_user(request, f'Successfully decreased stock for {updated} products.')
+    decrease_stock.short_description = "Decrease stock by 10"
+
+@admin.register(Order, site=admin_site)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'total_price', 'status', 'created_at')
+    list_filter = ('status', DateRangeFilter)
+    search_fields = ('user__username', 'user__email')
+    actions = ['mark_as_shipped']
+
+    def mark_as_shipped(self, request, queryset):
+        updated = queryset.update(status='shipped', shipped_at=timezone.now())
+        self.message_user(request, f'{updated} orders were successfully marked as shipped.')
+    mark_as_shipped.short_description = "Mark selected orders as shipped"
+
+@admin.register(CartItem, site=admin_site)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('user', 'product', 'quantity', 'total_price')
+    list_display = ('user', 'product', 'quantity')
     list_filter = ('user', 'product')
 
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ('user', 'total_price', 'created_at', 'status', 'is_paid')
-    list_filter = ('status', 'created_at')
-    search_fields = ('user__username',)
-    inlines = [CartItemInline]
-    actions = ['export_to_csv']
-
-    def is_paid(self, obj):
-        return obj.is_paid
-    is_paid.boolean = True
-
-    def export_to_csv(self, request, queryset):
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="orders.csv"'
-        writer = csv.writer(response)
-        writer.writerow(['Order ID', 'User', 'Total Price', 'Created At', 'Status', 'Is Paid'])
-        for order in queryset:
-            writer.writerow([order.id, order.user.username, order.total_price, order.created_at, order.status, order.is_paid])
-        return response
-    export_to_csv.short_description = "Export selected orders to CSV"

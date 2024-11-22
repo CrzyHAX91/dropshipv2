@@ -1,11 +1,21 @@
-
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
-<h2>User Profile</h2>
+<h2>{% trans "User Profile" %}</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Update Profile</button>
+    <button type="submit">{% trans "Update Profile" %}</button>
 </form>
+
+<h3>{% trans "Two-Factor Authentication" %}</h3>
+{% if default_device %}
+    <p>{% trans "Two-factor authentication is enabled." %}</p>
+    <a href="{% url 'two_factor:disable' %}" class="btn btn-warning">{% trans "Disable Two-Factor Authentication" %}</a>
+{% else %}
+    <p>{% trans "Two-factor authentication is not enabled." %}</p>
+    <a href="{% url 'two_factor:setup' %}" class="btn btn-primary">{% trans "Enable Two-Factor Authentication" %}</a>
+{% endif %}
+
 {% endblock %}
