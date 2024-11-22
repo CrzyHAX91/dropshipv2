@@ -30,3 +30,8 @@ e8d9dae Initial commit: Add dropship project files
 86b0114 Update
 2396f42 Update
 
+
+8. To-do for next session:
+   - Change the default branch on GitHub from 'main' to 'master'
+   - Delete the 'main' branch after changing the default
+   - Review 'test-ci-workflow' branch and decide whether to keep or delete
