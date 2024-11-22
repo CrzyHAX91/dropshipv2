@@ -1,0 +1,33 @@
+
+/* Custom styles for Dropship Project */
+
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.jumbotron {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 0.3rem;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+footer {
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background-color: #f8f9fa;
+}
+
+/* Add more custom styles as needed */
