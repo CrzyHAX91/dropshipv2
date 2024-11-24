@@ -50,4 +50,3 @@ class OrderAdmin(admin.ModelAdmin):
             else:
                 self.message_user(request, f"Order #{order.id} is not in pending status.", messages.WARNING)
     process_orders.short_description = "Process selected orders"
-

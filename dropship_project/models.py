@@ -55,4 +55,3 @@ class Order(models.Model):
         self.status = 'processing'
         self.save()
         return True
-

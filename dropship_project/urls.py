@@ -15,9 +15,10 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('sync-products/', views.sync_aliexpress_products, name='sync_products'),
+    path('helpdesk/', views.helpdesk, name='helpdesk'),
+    path('api/helpdesk/', views.helpdesk_api, name='helpdesk_api'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
