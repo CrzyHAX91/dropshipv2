@@ -1,0 +1,2 @@
+psycopg2-binary==2.9.3
+aliexpress-api-python==1.0.0

@@ -1,18 +1,20 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
-from django.contrib.auth import views as auth_views
-from .views import user_profile, user_dashboard, search_orders
+from django.conf import settings
+from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('admin/', admin.site.urls),
+    path('', views.product_list, name='product_list'),
+    path('product/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('cart/', views.cart, name='cart'),
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('order-confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
     path('accounts/', include('allauth.urls')),
-    path('profile/', user_profile, name='user_profile'),
-    path('dashboard/', user_dashboard, name='user_dashboard'),
-    path('search_orders/', search_orders, name='search_orders'),
-    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
-    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

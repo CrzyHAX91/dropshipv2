@@ -1,31 +1,21 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Order, CartItem, Product
+from .models import CustomUser, Product, CartItem, Order
 
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    list_display = ['email', 'username', 'is_staff', 'is_active']
-    list_filter = ['is_staff', 'is_active']
-    fieldsets = UserAdmin.fieldsets + (
-        ('Additional Info', {'fields': ('phone_number', 'address', 'date_of_birth')}),
-    )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Additional Info', {'fields': ('phone_number', 'address', 'date_of_birth')}),
-    )
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'phone_number')
 
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'created_at', 'total_price']
-    list_filter = ['created_at']
-
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ['user', 'product', 'quantity']
-
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'stock']
-    list_filter = ['price', 'stock']
+    list_display = ('name', 'cost_price', 'selling_price', 'stock')
+    list_filter = ('stock',)
 
-admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Order, OrderAdmin)
-admin.site.register(CartItem, CartItemAdmin)
-admin.site.register(Product, ProductAdmin)
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'quantity')
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('user', 'total_price', 'created_at', 'status')
+    list_filter = ('status',)
 
