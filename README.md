@@ -13,21 +13,29 @@ Dropship V2 is an automated dropshipping application that integrates with AliExp
 
 ## Installation and Setup
 
-[Include your existing installation and setup instructions here]
+[Your existing installation and setup instructions]
 
 ## AI Helpdesk
 
-The AI Helpdesk provides automated customer support. To access the helpdesk, navigate to the '/helpdesk' URL after starting the application.
+The AI Helpdesk provides automated customer support. To access the helpdesk, navigate to the '/helpdesk/' URL after starting the application. 
+
+Note: The current implementation is a placeholder. To fully implement the AI functionality, update the helpdesk_api view in views.py.
 
 ## Running the Application
 
-[Include your existing instructions for running the application]
+[Your existing instructions for running the application]
 
 ## Admin Access
 
-[Include your existing admin access instructions]
+[Your existing admin access instructions]
 
 ## Security and Automation
 
-[Include your existing security and automation details]
+[Your existing security and automation details]
+
+## Future Improvements
+
+- Implement actual AI model integration for the helpdesk
+- Add conversation history storage for the helpdesk
+- Develop admin controls for managing the helpdesk
 
