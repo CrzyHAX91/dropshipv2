@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.db.models import F, Sum
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from .models import Product, CartItem, Order
 from .aliexpress_integration import sync_products
+import json
 
 def is_admin(user):
     return user.is_staff or user.is_superuser
@@ -64,4 +67,19 @@ def admin_dashboard(request):
 def sync_aliexpress_products(request):
     sync_products()
     return JsonResponse({'status': 'success', 'message': 'Products synced successfully'})
+
+def helpdesk(request):
+    return render(request, 'helpdesk.html')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def helpdesk_api(request):
+    data = json.loads(request.body)
+    user_message = data.get('message', '')
+    
+    # Here you would typically send the user_message to an AI model and get a response
+    # For now, we'll just echo the message back
+    ai_response = f"You said: {user_message}"
+    
+    return JsonResponse({'response': ai_response})
 
