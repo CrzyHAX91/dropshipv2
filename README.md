@@ -39,3 +39,21 @@ Note: The current implementation is a placeholder. To fully implement the AI fun
 - Add conversation history storage for the helpdesk
 - Develop admin controls for managing the helpdesk
 
+
+## AI-Assisted Helpdesk
+
+We've implemented an AI-assisted helpdesk to improve customer support. Key features include:
+
+- Natural language processing for understanding customer queries
+- Personalized responses based on user profiles
+- Sentiment analysis to detect customer frustration
+- Multi-turn conversation handling
+- Feedback system for continuous improvement
+
+To use the AI Helpdesk, run the `ai_helpdesk.py` script and interact with the prompts.
+
+Future improvements:
+- Integration with the main dropshipping application
+- Expansion of the knowledge base
+- Implementation of more advanced NLP techniques
+- Connection to real customer data for more accurate personalization
