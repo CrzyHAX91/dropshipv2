@@ -1,25 +1,35 @@
 # Use an official Python runtime as the base image
-FROM python:3.9
+FROM python:3.9-slim AS base
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Set environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    APP_HOME=/app
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR $APP_HOME
 
-# Copy the project files into the container
-COPY . /app/
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpq-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install project dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Copy only requirements for better caching
+COPY requirements.txt $APP_HOME/
 
-# Run the setup script
-RUN python setup.py
+# Install Python dependencies
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Expose the port the app runs on
+# Copy the rest of the project files into the container
+COPY . $APP_HOME/
+
+# Use a non-root user
+RUN adduser --disabled-password appuser && chown -R appuser $APP_HOME
+USER appuser
+
+# Expose the port (configurable)
 EXPOSE 8000
 
-# Start the application
+# Default command to run the application
 CMD ["python", "dropship_project/manage.py", "runserver", "0.0.0.0:8000"]
+
