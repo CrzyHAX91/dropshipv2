@@ -1,9 +1,13 @@
-from ai_helpdesk import AdvancedAIHelpdesk
+import random
 import uuid
+import csv
+from ai_helpdesk import AdvancedAIHelpdesk
 
 def main():
+    # Initialize the helpdesk system
     helpdesk = AdvancedAIHelpdesk()
     
+    # Define test scenarios
     test_scenarios = [
         ["How can I track my package?", "What if my order is delayed?"],
         ["Tell me about shipping times", "Do you offer express shipping?"],
@@ -17,23 +21,41 @@ def main():
         ["What if my question isn't answered here?", "Can I speak to a human?"]
     ]
     
-    for i, scenario in enumerate(test_scenarios):
-        user_id = f"test_user_{uuid.uuid4().hex[:8]}"
-        
-        for j, question in enumerate(scenario):
-            question_id = f"q_{i+1}_{j+1}"
+    # Prepare CSV for test results
+    with open("helpdesk_test_results.csv", "w", newline="") as csvfile:
+        fieldnames = ["user_id", "question", "response", "feedback_score"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        # Run tests
+        for i, scenario in enumerate(test_scenarios):
+            # Generate a unique user ID for each scenario
+            user_id = f"test_user_{uuid.uuid4().hex[:8]}"
             
-            print(f"User {user_id} - Question: {question}")
-            response = helpdesk.generate_response(question, user_id)
-            print(f"Response: {response}")
-            
-            # Simulate user feedback (random score between 1 and 5)
-            feedback_score = random.randint(1, 5)
-            helpdesk.get_feedback(user_id, question_id, feedback_score)
-            print(f"Feedback score: {feedback_score}")
-            print("-" * 50)
-    
-    print(f"Average feedback score: {helpdesk.average_feedback():.2f}")
+            for j, question in enumerate(scenario):
+                print(f"User {user_id} - Question: {question}")
+                
+                # Generate response
+                response = helpdesk.generate_response(question, user_id)
+                print(f"Response: {response}")
+                
+                # Simulate feedback score (1-5)
+                feedback_score = random.randint(1, 5)
+                helpdesk.collect_feedback(user_id, feedback_score)
+                print(f"Feedback score: {feedback_score}")
+                print("-" * 50)
+                
+                # Log results to CSV
+                writer.writerow({
+                    "user_id": user_id,
+                    "question": question,
+                    "response": response,
+                    "feedback_score": feedback_score
+                })
+
+        # Display average feedback score
+        avg_score = helpdesk.average_feedback()
+        print(f"Average feedback score: {avg_score:.2f}")
 
 if __name__ == "__main__":
     main()
