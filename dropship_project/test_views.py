@@ -24,14 +24,22 @@ class ViewsTestCase(TestCase):
         self.assertContains(response, 'Welcome to Dropship V2')
 
     def test_dashboard_view(self):
-        self.client.login(username='testuser', password='testpassword')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('user_dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'User Dashboard')
 
     def test_profile_view(self):
-        self.client.login(username='testuser', password='testpassword')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('user_profile'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'User Profile')
+
+    def test_login_required_dashboard(self):
+        response = self.client.get(reverse('user_dashboard'))
+        self.assertRedirects(response, f'{reverse("account_login")}?next={reverse("user_dashboard")}')
+
+    def test_login_required_profile(self):
+        response = self.client.get(reverse('user_profile'))
+        self.assertRedirects(response, f'{reverse("account_login")}?next={reverse("user_profile")}')
 

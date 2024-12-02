@@ -13,6 +13,10 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('order-confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
     path('accounts/', include('allauth.urls')),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('sync-products/', views.sync_aliexpress_products, name='sync_products'),
+    path('helpdesk/', views.helpdesk, name='helpdesk'),
+    path('api/helpdesk/', views.helpdesk_api, name='helpdesk_api'),
 ]
 
 if settings.DEBUG:

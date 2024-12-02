@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from .aliexpress_integration import place_aliexpress_order
 
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -44,3 +45,13 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
 
+    def process_order(self):
+        for item in self.items.all():
+            success = place_aliexpress_order(item.product, item.quantity, self.user)
+            if not success:
+                self.status = 'cancelled'
+                self.save()
+                return False
+        self.status = 'processing'
+        self.save()
+        return True

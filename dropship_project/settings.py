@@ -1,14 +1,22 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -16,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'dropship_project',
     'allauth',
     'allauth.account',
@@ -84,9 +91,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'dropship_project.CustomUser'
 
-SITE_ID = 1
+# AliExpress API settings
+ALIEXPRESS_APP_KEY = os.getenv('ALIEXPRESS_APP_KEY')
+ALIEXPRESS_APP_SECRET = os.getenv('ALIEXPRESS_APP_SECRET')
 
+# Django-allauth settings
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'
