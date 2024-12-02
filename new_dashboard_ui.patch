@@ -1,0 +1,405 @@
+diff --git a/home/user/static/js/components/dashboard-layout.tsx b/home/user/static/js/components/dashboard-layout.tsx
+new file mode 100644
+index 0000000..f114f4e
+--- /dev/null
++++ b/home/user/static/js/components/dashboard-layout.tsx
+@@ -0,0 +1,72 @@
++
++"use client"
++
++import { useState } from 'react'
++import { Button } from "@/components/ui/button"
++import { MoonIcon, SunIcon } from "@radix-ui/react-icons"
++import { useTheme } from "next-themes"
++import { SidebarNav } from './sidebar-nav'
++import { UserProfileDropdown } from './user-profile-dropdown'
++
++export function ThemeToggle() {
++  const { setTheme, theme } = useTheme()
++
++  return (
++    <Button
++      variant="ghost"
++      size="icon"
++      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
++    >
++      <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
++      <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
++      <span className="sr-only">Toggle theme</span>
++    </Button>
++  )
++}
++
++export default function DashboardLayout({ children }) {
++  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
++
++  return (
++    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
++      {/* Sidebar */}
++      <aside className={`bg-white dark:bg-gray-800 ${isSidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 ease-in-out`}>
++        <div className="p-4">
++          <h1 className={`text-2xl font-bold text-gray-800 dark:text-white ${isSidebarOpen ? '' : 'text-center'}`}>
++            {isSidebarOpen ? 'Dropship V2' : 'D2'}
++          </h1>
++        </div>
++        <SidebarNav isOpen={isSidebarOpen} />
++      </aside>
++
++      {/* Main content */}
++      <div className="flex-1 flex flex-col overflow-hidden">
++        {/* Header */}
++        <header className="bg-white dark:bg-gray-800 shadow-sm">
++          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
++            <Button
++              variant="ghost"
++              size="icon"
++              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
++            >
++              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
++                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
++              </svg>
++            </Button>
++            <div className="flex items-center space-x-4">
++              <ThemeToggle />
++              <UserProfileDropdown />
++            </div>
++          </div>
++        </header>
++
++        {/* Page content */}
++        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900">
++          <div className="container mx-auto px-6 py-8">
++            {children}
++          </div>
++        </main>
++      </div>
++    </div>
++  )
++}
+diff --git a/home/user/static/js/components/sidebar-nav.tsx b/home/user/static/js/components/sidebar-nav.tsx
+new file mode 100644
+index 0000000..3412126
+--- /dev/null
++++ b/home/user/static/js/components/sidebar-nav.tsx
+@@ -0,0 +1,30 @@
++
++import Link from 'next/link'
++import { HomeIcon, PackageIcon, ShoppingCartIcon, UsersIcon, SettingsIcon } from 'lucide-react'
++
++const navItems = [
++  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
++  { name: 'Products', href: '/products', icon: PackageIcon },
++  { name: 'Orders', href: '/orders', icon: ShoppingCartIcon },
++  { name: 'Customers', href: '/customers', icon: UsersIcon },
++  { name: 'Settings', href: '/settings', icon: SettingsIcon },
++]
++
++export function SidebarNav({ isOpen }) {
++  return (
++    <nav className="mt-8">
++      {navItems.map((item) => (
++        <Link
++          key={item.name}
++          href={item.href}
++          className={`flex items-center px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ${
++            isOpen ? '' : 'justify-center'
++          }`}
++        >
++          <item.icon className="h-5 w-5" />
++          {isOpen && <span className="ml-4">{item.name}</span>}
++        </Link>
++      ))}
++    </nav>
++  )
++}
+diff --git a/home/user/static/js/components/theme-provider.tsx b/home/user/static/js/components/theme-provider.tsx
+new file mode 100644
+index 0000000..1e0c8e3
+--- /dev/null
++++ b/home/user/static/js/components/theme-provider.tsx
+@@ -0,0 +1,10 @@
++
++"use client"
++
++import * as React from "react"
++import { ThemeProvider as NextThemesProvider } from "next-themes"
++import { type ThemeProviderProps } from "next-themes/dist/types"
++
++export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
++  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
++}
+diff --git a/home/user/static/js/components/user-profile-dropdown.tsx b/home/user/static/js/components/user-profile-dropdown.tsx
+new file mode 100644
+index 0000000..538c176
+--- /dev/null
++++ b/home/user/static/js/components/user-profile-dropdown.tsx
+@@ -0,0 +1,56 @@
++
++"use client"
++
++import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
++import { Button } from "@/components/ui/button"
++import {
++  DropdownMenu,
++  DropdownMenuContent,
++  DropdownMenuGroup,
++  DropdownMenuItem,
++  DropdownMenuLabel,
++  DropdownMenuSeparator,
++  DropdownMenuTrigger,
++} from "@/components/ui/dropdown-menu"
++import { UserIcon, SettingsIcon, LogOutIcon } from 'lucide-react'
++
++export function UserProfileDropdown() {
++  return (
++    <DropdownMenu>
++      <DropdownMenuTrigger asChild>
++        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
++          <Avatar className="h-8 w-8">
++            <AvatarImage src="/avatars/01.png" alt="@username" />
++            <AvatarFallback>JD</AvatarFallback>
++          </Avatar>
++        </Button>
++      </DropdownMenuTrigger>
++      <DropdownMenuContent className="w-56" align="end" forceMount>
++        <DropdownMenuLabel className="font-normal">
++          <div className="flex flex-col space-y-1">
++            <p className="text-sm font-medium leading-none">John Doe</p>
++            <p className="text-xs leading-none text-muted-foreground">
++              john.doe@example.com
++            </p>
++          </div>
++        </DropdownMenuLabel>
++        <DropdownMenuSeparator />
++        <DropdownMenuGroup>
++          <DropdownMenuItem>
++            <UserIcon className="mr-2 h-4 w-4" />
++            <span>Profile</span>
++          </DropdownMenuItem>
++          <DropdownMenuItem>
++            <SettingsIcon className="mr-2 h-4 w-4" />
++            <span>Settings</span>
++          </DropdownMenuItem>
++        </DropdownMenuGroup>
++        <DropdownMenuSeparator />
++        <DropdownMenuItem>
++          <LogOutIcon className="mr-2 h-4 w-4" />
++          <span>Log out</span>
++        </DropdownMenuItem>
++      </DropdownMenuContent>
++    </DropdownMenu>
++  )
++}
+diff --git a/home/user/templates/base.html b/home/user/templates/base.html
+index 4b164a1..289e8b5 100644
+--- a/home/user/templates/base.html
++++ b/home/user/templates/base.html
+@@ -1,67 +1,23 @@
+ 
+-{% load static %}
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>{% block title %}Dropship Project{% endblock %}</title>
+-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+-    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
++    <title>{% block title %}Dropship V2{% endblock %}</title>
++    <script src="https://cdn.tailwindcss.com"></script>
++    <style>
++        /* Add any custom styles here */
++        .dark {
++            color-scheme: dark;
++        }
++    </style>
++    {% block extra_head %}{% endblock %}
+ </head>
+-<body>
+-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+-        <div class="container">
+-            <a class="navbar-brand" href="{% url 'home' %}">Dropship Project</a>
+-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+-                <span class="navbar-toggler-icon"></span>
+-            </button>
+-            <div class="collapse navbar-collapse" id="navbarNav">
+-                <ul class="navbar-nav">
+-                    <li class="nav-item">
+-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+-                    </li>
+-                    {% if user.is_authenticated %}
+-                        <li class="nav-item">
+-                            <a class="nav-link" href="{% url 'user_profile' %}">Profile</a>
+-                        </li>
+-                        <li class="nav-item">
+-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+-                        </li>
+-                    {% else %}
+-                        <li class="nav-item">
+-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+-                        </li>
+-                        <li class="nav-item">
+-                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+-                        </li>
+-                    {% endif %}
+-                </ul>
+-            </div>
+-        </div>
+-    </nav>
+-
+-    <div class="container mt-4">
+-        {% if messages %}
+-            {% for message in messages %}
+-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+-                    {{ message }}
+-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+-                </div>
+-            {% endfor %}
+-        {% endif %}
+-
+-        {% block content %}
+-        {% endblock %}
++<body class="bg-gray-100 dark:bg-gray-900">
++    <div id="app">
++        {% block content %}{% endblock %}
+     </div>
+-
+-    <footer class="mt-5 py-3 bg-light">
+-        <div class="container text-center">
+-            <p>&copy; 2023 Dropship Project. All rights reserved.</p>
+-        </div>
+-    </footer>
+-
+-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+-    <script src="{% static 'js/custom.js' %}"></script>
++    {% block extra_body %}{% endblock %}
+ </body>
+ </html>
+diff --git a/home/user/templates/dashboard.html b/home/user/templates/dashboard.html
+index 3c3e54c..b403270 100644
+--- a/home/user/templates/dashboard.html
++++ b/home/user/templates/dashboard.html
+@@ -1,90 +1,38 @@
+ 
+ {% extends 'base.html' %}
+-
+-{% block title %}Dashboard{% endblock %}
++{% load static %}
+ 
+ {% block content %}
+-<div class="container">
+-    <h1 class="mb-4">Dashboard</h1>
+-    <div class="row">
+-        <div class="col-md-4 mb-4">
+-            <div class="card">
+-                <div class="card-body">
+-                    <h5 class="card-title">Total Orders</h5>
+-                    <p class="card-text display-4">{{ total_orders }}</p>
+-                </div>
+-            </div>
+-        </div>
+-        <div class="col-md-4 mb-4">
+-            <div class="card">
+-                <div class="card-body">
+-                    <h5 class="card-title">Total Spent</h5>
+-                    <p class="card-text display-4">${{ total_spent|floatformat:2 }}</p>
+-                </div>
+-            </div>
+-        </div>
+-        <div class="col-md-4 mb-4">
+-            <div class="card">
+-                <div class="card-body">
+-                    <h5 class="card-title">Available Products</h5>
+-                    <p class="card-text display-4">{{ product_count }}</p>
+-                </div>
+-            </div>
+-        </div>
+-    </div>
+-    <div class="row">
+-        <div class="col-md-8">
+-            <h2>Recent Orders</h2>
+-            {% if user_orders %}
+-                <table class="table table-striped">
+-                    <thead>
+-                        <tr>
+-                            <th>Order ID</th>
+-                            <th>Product</th>
+-                            <th>Quantity</th>
+-                            <th>Total Price</th>
+-                            <th>Status</th>
+-                        </tr>
+-                    </thead>
+-                    <tbody>
+-                        {% for order in user_orders %}
+-                        <tr>
+-                            <td>{{ order.id }}</td>
+-                            <td>{{ order.product.name }}</td>
+-                            <td>{{ order.quantity }}</td>
+-                            <td>${{ order.total_price }}</td>
+-                            <td>{{ order.get_status_display }}</td>
+-                        </tr>
+-                        {% endfor %}
+-                    </tbody>
+-                </table>
+-            {% else %}
+-                <p>You have no recent orders.</p>
+-            {% endif %}
+-        </div>
+-        <div class="col-md-4">
+-            <h2>Top Products</h2>
+-            <ul class="list-group">
+-                {% for product in top_products %}
+-                <li class="list-group-item d-flex justify-content-between align-items-center">
+-                    {{ product.name }}
+-                    <span class="badge bg-primary rounded-pill">{{ product.order_count }}</span>
+-                </li>
+-                {% endfor %}
+-            </ul>
+-            <h2 class="mt-4">Quick Links</h2>
+-            <ul class="list-group">
+-                <li class="list-group-item">
+-                    <a href="{% url 'user_profile' %}">Edit Profile</a>
+-                </li>
+-                <li class="list-group-item">
+-                    <a href="{% url 'all_orders' %}">View All Orders</a>
+-                </li>
+-                <li class="list-group-item">
+-                    <a href="{% url 'browse_products' %}">Browse Products</a>
+-                </li>
+-            </ul>
+-        </div>
+-    </div>
+-</div>
++<div id="react-dashboard-root"></div>
++
++<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
++<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
++<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
++
++<script type="text/babel" src="{% static 'js/components/theme-provider.tsx' %}"></script>
++<script type="text/babel" src="{% static 'js/components/sidebar-nav.tsx' %}"></script>
++<script type="text/babel" src="{% static 'js/components/user-profile-dropdown.tsx' %}"></script>
++<script type="text/babel" src="{% static 'js/components/dashboard-layout.tsx' %}"></script>
++
++<script type="text/babel">
++function Dashboard() {
++  return (
++    <DashboardLayout>
++      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
++      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
++        {/* Add your dashboard content here */}
++      </div>
++    </DashboardLayout>
++  );
++}
++
++ReactDOM.render(
++  <React.StrictMode>
++    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
++      <Dashboard />
++    </ThemeProvider>
++  </React.StrictMode>,
++  document.getElementById('react-dashboard-root')
++);
++</script>
+ {% endblock %}
