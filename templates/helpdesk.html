@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Helpdesk{% endblock %}
+
+{% block extra_css %}
+<style>
+    #chatbox {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .user-message {
+        background-color: #e6f2ff;
+        padding: 5px 10px;
+        margin: 5px 0;
+        border-radius: 10px;
+    }
+    .ai-message {
+        background-color: #f0f0f0;
+        padding: 5px 10px;
+        margin: 5px 0;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>AI Helpdesk</h1>
+    <div id="chatbox"></div>
+    <div class="input-group mb-3">
+        <input type="text" id="user-input" class="form-control" placeholder="Type your question here...">
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" id="send-button">Send</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const chatbox = document.getElementById('chatbox');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+
+    function addMessage(message, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = isUser ? 'user-message' : 'ai-message';
+        messageDiv.textContent = message;
+        chatbox.appendChild(messageDiv);
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (message) {
+            addMessage(message, true);
+            userInput.value = '';
+
+            // Send message to backend
+            fetch('/api/helpdesk/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage(data.response, false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('Sorry, there was an error processing your request.', false);
+            });
+        }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+{% endblock %}
