@@ -1,12 +1,8 @@
-from django.contrib.auth import login
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
 from django.db.models import F, Sum
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
 from .models import Product, CartItem, Order
 from .aliexpress_integration import sync_products
-import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import View
@@ -80,6 +76,15 @@ class SyncAliexpressProductsView(AdminRequiredMixin, View):
 class HelpdeskView(View):
     def get(self, request):
         return render(request, 'helpdesk.html')
+
+    def post(self, request):
+        user_query = request.POST.get('query', '')
+        response = generate_response(user_query)  # Placeholder for AI response generation
+        return JsonResponse({'response': response})
+
+def generate_response(query):
+    # Placeholder function for generating AI responses
+    return "This is a placeholder response for your query: " + query
 
     def post(self, request):
         user_query = request.POST.get('query', '')
