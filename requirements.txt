@@ -1,0 +1,9 @@
+Django==4.2.16
+django-allauth==0.45.0
+Pillow==10.3.0
+python-dotenv==0.19.2
+aliexpress-api-python==1.0.0
+
+fuzzywuzzy
+python-Levenshtein
+textblob
