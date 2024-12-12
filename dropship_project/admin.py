@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib import messages
 from .models import CustomUser, Product, CartItem, Order
 from .aliexpress_integration import sync_products
@@ -14,10 +14,14 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('stock',)
     search_fields = ('name',)
     actions = ['sync_with_aliexpress']
+    list_filter = ('stock',)
+    search_fields = ('name',)
+    actions = ['sync_with_aliexpress']
 
     def sync_with_aliexpress(self, request, queryset):
         sync_products()
-        self.message_user(request, "Products synced with AliExpress successfully.", messages.SUCCESS)
+        self.message_user(request, "Products synced with AliExpress successfully.",
+                          messages.SUCCESS)
     sync_with_aliexpress.short_description = "Sync selected products with AliExpress"
 
 @admin.register(CartItem)
