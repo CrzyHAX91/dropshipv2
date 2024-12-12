@@ -1,13 +1,14 @@
-# Dependabot configuration for version updates
-# Specify package ecosystems and their respective locations for manifests.
+# Configuration file for Dependabot
 
 version: 2
 
+# Define the package manager and its configuration
 updates:
-  - package-ecosystem: "npm"  # Specify the package manager (e.g., npm, pip, etc.)
-    directory: "/"             # Path to the package manifest
+  - package-ecosystem: "pip"  # Use pip as the package manager
+    directory: "requirements.txt"  # Location of package manifests
     schedule:
-      interval: "weekly"       # Frequency of update checks
-      day: "monday"            # Day of the week to check for updates
-      time: "09:00"            # Time of day to check for updates (hh:mm)
-      timezone: "UTC"          # Timezone for the scheduled checks
+      interval: "daily"  # Check for updates daily
+      time: "02:00"  # Perform updates at 2 AM UTC
+      timezone: "UTC"  # Use the UTC timezone for updates
+    labels: "dependencies"  # Optional: add a label to updates
+    assignees: ["username"]  # Optional: assign updates to a specific user
