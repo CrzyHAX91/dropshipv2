@@ -1,6 +1,3 @@
-No code was selected, so I will provide a general improvement to the code. 
-
-Here's an improved version of the `DashboardLayout` component:
 
 ```typescript
 export default function DashboardLayout({ children }) {
