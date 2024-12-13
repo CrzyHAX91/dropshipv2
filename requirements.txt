@@ -1,5 +1,5 @@
 Django==5.1.4
-django-allauth==0.45.0
+django-allauth==65.3.0
 Pillow==11.0.0
 python-dotenv==1.0.1
 aliexpress-api-python==1.0.0
