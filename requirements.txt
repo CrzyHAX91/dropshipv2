@@ -1,7 +1,7 @@
-Django==4.2.16
-django-allauth==0.45.0
-Pillow==10.3.0
-python-dotenv==0.19.2
+Django==5.1.4
+django-allauth==65.3.0
+Pillow==11.0.0
+python-dotenv==1.0.1
 aliexpress-api-python==1.0.0
 
 fuzzywuzzy

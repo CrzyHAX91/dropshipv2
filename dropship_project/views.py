@@ -2,11 +2,8 @@ from django.contrib.auth import login
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.db.models import F, Sum
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
 from .models import Product, CartItem, Order
 from .aliexpress_integration import sync_products
-import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import View
@@ -86,12 +83,20 @@ class HelpdeskView(View):
         response = generate_response(user_query)  # Placeholder for AI response generation
         return JsonResponse({'response': response})
 
+# Remove duplicate function definition
+
+    def post(self, request):
+        user_query = request.POST.get('query', '')
+        response = generate_response(user_query)  # Placeholder for AI response generation
+        return JsonResponse({'response': response})
+
 def generate_response(query):
     # Placeholder function for generating AI responses
     return "This is a placeholder response for your query: " + queryimport  # type: ignore
 
 # Create a logger
-logger = login.getLogger(__name__)
+import logging
+logger = logging.getLogger(__name__)
 
 # Set the logging level
 logger.setLevel(login.INFO)
