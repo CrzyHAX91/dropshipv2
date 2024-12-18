@@ -56,6 +56,12 @@ def main():
         # Display average feedback score
         avg_score = helpdesk.average_feedback()
         print(f"Average feedback score: {avg_score:.2f}")
+        
+        # Display detailed feedback statistics
+        print("Detailed Feedback Statistics:")
+        print(f"Total Feedback Count: {helpdesk.total_feedback_count()}")
+        print(f"Average Feedback Score by Question: {helpdesk.average_feedback_by_question()}")
+        print(f"Top 5 Questions by Feedback Score: {helpdesk.top_questions_by_feedback_score(5)}")
 
 if __name__ == "__main__":
     main()
