@@ -1,0 +1,187 @@
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --dark-background: #2c3e50;
+    --dark-text: #ecf0f1;
+    --card-background: #ffffff;
+    --card-background-dark: #34495e;
+}
+
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+body.dark-mode {
+    background-color: var(--dark-background);
+    color: var(--dark-text);
+}
+
+.navbar {
+    background-color: var(--primary-color) !important;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-light .navbar-brand,
+.navbar-light .nav-link {
+    color: white !important;
+}
+
+.dark-mode .navbar {
+    background-color: var(--dark-background) !important;
+}
+
+.dark-mode .navbar-light .navbar-brand,
+.dark-mode .navbar-light .nav-link {
+    color: var(--dark-text) !important;
+}
+
+.footer {
+    background-color: var(--primary-color) !important;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.dark-mode .footer {
+    background-color: var(--dark-background) !important;
+    color: var(--dark-text);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: darken(var(--primary-color), 10%);
+    border-color: darken(var(--primary-color), 10%);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: darken(var(--secondary-color), 10%);
+    border-color: darken(var(--secondary-color), 10%);
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    background-color: var(--card-background);
+}
+
+.card:hover {
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .card {
+    background-color: var(--card-background-dark);
+    color: var(--dark-text);
+}
+
+.content-wrapper {
+    min-height: calc(100vh - 60px);
+    padding-bottom: 60px;
+}
+
+.spinner-border {
+    display: none;
+}
+
+.loading .spinner-border {
+    display: inline-block;
+}
+
+#toast-container {
+    z-index: 1056;
+}
+
+/* Password strength meter styles */
+.pass-strength-visible .pass-strength-meter {
+    margin-top: 10px;
+}
+
+.pass-strength-visible .pass-strength-meter.pass-strength-invalid {
+    color: #dc3545;
+}
+
+.pass-strength-visible .pass-strength-meter.pass-strength-valid {
+    color: #28a745;
+}
+
+/* Form styles */
+.form-control {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark-mode .form-control {
+    background-color: var(--dark-background);
+    color: var(--dark-text);
+    border-color: #4a5568;
+}
+
+.dark-mode .form-control:focus {
+    background-color: var(--dark-background);
+    color: var(--dark-text);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Modal styles */
+.modal-content {
+    transition: background-color 0.3s ease;
+}
+
+.dark-mode .modal-content {
+    background-color: var(--card-background-dark);
+    color: var(--dark-text);
+}
+
+/* User preferences styles */
+.form-check-input {
+    cursor: pointer;
+}
+
+.dark-mode .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.card, .btn, .form-control {
+    transition: all 0.3s ease;
+}
+
+.card:hover, .btn:hover, .form-control:focus {
+    transform: translateY(-2px);
+}
