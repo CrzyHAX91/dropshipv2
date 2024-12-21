@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h2>{% trans "Register" %}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% trans "Register" %}</button>
+</form>
+
+<div class="password-requirements mt-3">
+    <h4>{% trans "Password Requirements:" %}</h4>
+    <ul>
+        <li>{% trans "Minimum length: 10 characters" %}</li>
+        <li>{% trans "At least 5 unique characters" %}</li>
+        <li>{% trans "At least 1 lowercase letter" %}</li>
+        <li>{% trans "At least 1 uppercase letter" %}</li>
+        <li>{% trans "At least 1 number" %}</li>
+        <li>{% trans "At least 1 special character" %}</li>
+    </ul>
+</div>
+
+<p>{% trans "Already have an account?" %} <a href="{% url 'account_login' %}">{% trans "Log in" %}</a></p>
+{% endblock %}

@@ -1,0 +1,21 @@
+<h2>{{ widget.title }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Total Price</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in widget.get_context.orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.user.username }}</td>
+                <td>${{ order.total_price }}</td>
+                <td>{{ order.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

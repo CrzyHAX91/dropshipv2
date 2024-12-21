@@ -1,0 +1,6 @@
+<h2>{{ widget.title }}</h2>
+<ul>
+    <li>Total Sales: ${{ widget.get_context.total_sales|floatformat:2 }}</li>
+    <li>Today's Sales: ${{ widget.get_context.today_sales|floatformat:2 }}</li>
+    <li>This Month's Sales: ${{ widget.get_context.month_sales|floatformat:2 }}</li>
+</ul>

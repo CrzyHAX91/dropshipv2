@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"uri": "vscode-vfs://github/CrzyHAX91/dropshipv2"
+		},
+		{
+			"name": "dropshipv2",
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.editor.defaultBinaryEditor": "jupyter-notebook",
+		"CodeGPT.apiKey": "CodeGPT Plus Beta"
+	}
+}
