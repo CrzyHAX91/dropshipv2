@@ -1,304 +1,352 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  Grid,
+  Typography,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Button,
+  Drawer,
+  IconButton,
+  Divider,
+  Slider,
+  Chip,
+} from '@material-ui/core';
+import {
+  FilterList as FilterIcon,
+  Close as CloseIcon,
+  Search as SearchIcon,
+} from '@material-ui/icons';
 import ProductCard from '../components/ProductCard';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { useToast } from '../components/common/Toast';
 
-const ProductList = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [categories, setCategories] = useState({});
-    const [filters, setFilters] = useState({
-        priceRange: { min: 0, max: 1000 },
-        rating: 0,
-        maxShippingDays: 30,
-        inStock: true
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  header: {
+    marginBottom: theme.spacing(4),
+  },
+  searchBar: {
+    display: 'flex',
+    marginBottom: theme.spacing(3),
+    gap: theme.spacing(2),
+  },
+  search: {
+    flexGrow: 1,
+  },
+  filterDrawer: {
+    width: 320,
+    padding: theme.spacing(3),
+  },
+  filterHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing(3),
+  },
+  filterSection: {
+    marginBottom: theme.spacing(3),
+  },
+  priceRange: {
+    marginTop: theme.spacing(2),
+  },
+  activeFilters: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: theme.spacing(1),
+    marginBottom: theme.spacing(2),
+  },
+  noResults: {
+    textAlign: 'center',
+    marginTop: theme.spacing(4),
+  },
+}));
+
+const sortOptions = [
+  { value: 'popular', label: 'Most Popular' },
+  { value: 'newest', label: 'Newest First' },
+  { value: 'price_asc', label: 'Price: Low to High' },
+  { value: 'price_desc', label: 'Price: High to Low' },
+  { value: 'rating', label: 'Highest Rated' },
+];
+
+const categories = [
+  'All Categories',
+  'Electronics',
+  'Fashion',
+  'Home & Garden',
+  'Sports',
+  'Beauty',
+  'Toys',
+];
+
+function ProductList() {
+  const classes = useStyles();
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [filters, setFilters] = useState({
+    search: '',
+    category: 'All Categories',
+    sortBy: 'popular',
+    priceRange: [0, 1000],
+    inStock: false,
+    onSale: false,
+  });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      // TODO: Replace with actual API call
+      const response = await fetch('/api/products?' + new URLSearchParams(filters));
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      showToast({
+        message: 'Error fetching products',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [filters]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleAddToCart = (productId) => {
+    showToast({
+      message: 'Product added to cart',
+      severity: 'success',
     });
-    const [showFilters, setShowFilters] = useState(false);
+  };
 
-    const fetchProducts = useCallback(async () => {
-        try {
-            setLoading(true);
-            let url = 'http://localhost:3000/api/aliexpress';
+  const handleToggleFavorite = (productId) => {
+    // TODO: Implement favorite toggle logic
+  };
 
-            if (searchQuery) {
-                url += `/search?query=${encodeURIComponent(searchQuery)}`;
-            } else if (selectedCategory) {
-                url += `/category/${selectedCategory}`;
-            } else {
-                url += '/sync/top';
-            }
+  const clearFilters = () => {
+    setFilters({
+      search: '',
+      category: 'All Categories',
+      sortBy: 'popular',
+      priceRange: [0, 1000],
+      inStock: false,
+      onSale: false,
+    });
+  };
 
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Failed to fetch products');
-            }
-            const data = await response.json();
-            setProducts(Array.isArray(data) ? data : data.products || []);
-            setLoading(false);
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-        }
-    }, [searchQuery, selectedCategory]);
-
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/api/aliexpress/categories');
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories');
-            }
-            const data = await response.json();
-            setCategories(data);
-        } catch (err) {
-            console.error('Error fetching categories:', err);
-        }
-    };
-
-    useEffect(() => {
-        fetchCategories();
-        fetchProducts();
-    }, [fetchProducts]);
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        fetchProducts();
-    };
-
-    const handleCategoryChange = (e) => {
-        setSelectedCategory(e.target.value);
-        setSearchQuery('');
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[400px]">
-                <div className="loading loading-spinner loading-lg"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="alert alert-error shadow-lg max-w-2xl mx-auto">
-                <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{error}</span>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-center mb-6 text-gradient">AliExpress Products</h2>
-                
-                <div className="flex flex-col md:flex-row gap-4 justify-between items-start mb-6">
-                    {/* Filters Toggle Button */}
-                    <button
-                        className="btn btn-ghost gap-2 md:hidden"
-                        onClick={() => setShowFilters(!showFilters)}
-                    >
-                        <i className="fas fa-filter"></i>
-                        Filters
-                        {Object.values(filters).some(val => 
-                            typeof val === 'object' 
-                                ? Object.values(val).some(v => v !== 0) 
-                                : val !== 0 && val !== false
-                        ) && (
-                            <div className="badge badge-primary badge-sm"></div>
-                        )}
-                    </button>
-
-                    {/* Filters Panel */}
-                    <div className={`w-full md:w-64 bg-base-100 p-4 rounded-box shadow-lg mb-4 md:mb-0 
-                        ${showFilters ? 'block' : 'hidden md:block'}`}>
-                        <h3 className="font-bold mb-4">Filters</h3>
-                        
-                        {/* Price Range Filter */}
-                        <div className="form-control mb-4">
-                            <label className="label">
-                                <span className="label-text">Price Range</span>
-                                <span className="label-text-alt">
-                                    ${filters.priceRange.min} - ${filters.priceRange.max}
-                                </span>
-                            </label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <input
-                                    type="number"
-                                    placeholder="Min"
-                                    className="input input-bordered w-full"
-                                    value={filters.priceRange.min}
-                                    onChange={(e) => setFilters({
-                                        ...filters,
-                                        priceRange: { ...filters.priceRange, min: Number(e.target.value) }
-                                    })}
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Max"
-                                    className="input input-bordered w-full"
-                                    value={filters.priceRange.max}
-                                    onChange={(e) => setFilters({
-                                        ...filters,
-                                        priceRange: { ...filters.priceRange, max: Number(e.target.value) }
-                                    })}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Rating Filter */}
-                        <div className="form-control mb-4">
-                            <label className="label">
-                                <span className="label-text">Minimum Rating</span>
-                                <span className="label-text-alt">{filters.rating}+ ★</span>
-                            </label>
-                            <input
-                                type="range"
-                                min="0"
-                                max="5"
-                                value={filters.rating}
-                                className="range range-primary range-sm"
-                                step="0.5"
-                                onChange={(e) => setFilters({
-                                    ...filters,
-                                    rating: Number(e.target.value)
-                                })}
-                            />
-                            <div className="w-full flex justify-between text-xs px-2">
-                                <span>|</span>
-                                <span>|</span>
-                                <span>|</span>
-                                <span>|</span>
-                                <span>|</span>
-                                <span>|</span>
-                            </div>
-                        </div>
-
-                        {/* Shipping Time Filter */}
-                        <div className="form-control mb-4">
-                            <label className="label">
-                                <span className="label-text">Max Shipping Days</span>
-                                <span className="label-text-alt">{filters.maxShippingDays} days</span>
-                            </label>
-                            <input
-                                type="range"
-                                min="7"
-                                max="60"
-                                value={filters.maxShippingDays}
-                                className="range range-primary range-sm"
-                                step="1"
-                                onChange={(e) => setFilters({
-                                    ...filters,
-                                    maxShippingDays: Number(e.target.value)
-                                })}
-                            />
-                        </div>
-
-                        {/* Stock Filter */}
-                        <div className="form-control">
-                            <label className="label cursor-pointer">
-                                <span className="label-text">In Stock Only</span>
-                                <input
-                                    type="checkbox"
-                                    className="toggle toggle-primary"
-                                    checked={filters.inStock}
-                                    onChange={(e) => setFilters({
-                                        ...filters,
-                                        inStock: e.target.checked
-                                    })}
-                                />
-                            </label>
-                        </div>
-
-                        <div className="divider"></div>
-
-                        <button
-                            className="btn btn-outline btn-sm w-full"
-                            onClick={() => setFilters({
-                                priceRange: { min: 0, max: 1000 },
-                                rating: 0,
-                                maxShippingDays: 30,
-                                inStock: true
-                            })}
-                        >
-                            Reset Filters
-                        </button>
-                    </div>
-
-                    {/* Search Form */}
-                    <form onSubmit={handleSearch} className="flex-1 max-w-xl">
-                        <div className="join w-full">
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                className="input input-bordered join-item flex-1"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            <button type="submit" className="btn btn-primary join-item">
-                                <i className="fas fa-search mr-2" />
-                                Search
-                            </button>
-                        </div>
-                    </form>
-
-                    {/* Category Select */}
-                    <select
-                        className="select select-bordered w-full max-w-xs"
-                        value={selectedCategory}
-                        onChange={handleCategoryChange}
-                    >
-                        <option value="">All Categories</option>
-                        {Object.entries(categories).map(([name, id]) => (
-                            <option key={id} value={id}>{name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Sync Button */}
-                <div className="text-center mb-6">
-                    <button
-                        onClick={fetchProducts}
-                        className="btn btn-secondary btn-outline"
-                    >
-                        <i className="fas fa-sync-alt mr-2" />
-                        Sync Products
-                    </button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products
-                    .filter(product => {
-                        const price = product.price;
-                        const rating = product.rating || 0;
-                        const shippingDays = parseInt(product.shippingTime) || 30;
-                        
-                        return (
-                            price >= filters.priceRange.min &&
-                            price <= filters.priceRange.max &&
-                            rating >= filters.rating &&
-                            shippingDays <= filters.maxShippingDays &&
-                            (!filters.inStock || product.stock > 0)
-                        );
-                    })
-                    .map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))
-                }
-            </div>
-            
-            {products.length === 0 && (
-                <div className="text-center text-gray-500 mt-8">
-                    No products available. Try a different search or category.
-                </div>
-            )}
+  return (
+    <div className={classes.root}>
+      <div className={classes.header}>
+        <Typography variant="h4" gutterBottom>
+          Products
+        </Typography>
+        <div className={classes.searchBar}>
+          <TextField
+            className={classes.search}
+            variant="outlined"
+            placeholder="Search products..."
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            InputProps={{
+              startAdornment: <SearchIcon color="action" />,
+            }}
+          />
+          <FormControl variant="outlined" style={{ minWidth: 200 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={filters.sortBy}
+              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+              label="Sort By"
+            >
+              {sortOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="outlined"
+            startIcon={<FilterIcon />}
+            onClick={() => setDrawerOpen(true)}
+          >
+            Filters
+          </Button>
         </div>
-    );
-};
+
+        {Object.keys(filters).some((key) => {
+          if (key === 'priceRange') {
+            return filters[key][0] !== 0 || filters[key][1] !== 1000;
+          }
+          return filters[key] && filters[key] !== 'All Categories';
+        }) && (
+          <Box className={classes.activeFilters}>
+            {filters.category !== 'All Categories' && (
+              <Chip
+                label={`Category: ${filters.category}`}
+                onDelete={() => handleFilterChange('category', 'All Categories')}
+              />
+            )}
+            {filters.inStock && (
+              <Chip
+                label="In Stock Only"
+                onDelete={() => handleFilterChange('inStock', false)}
+              />
+            )}
+            {filters.onSale && (
+              <Chip
+                label="On Sale"
+                onDelete={() => handleFilterChange('onSale', false)}
+              />
+            )}
+            <Button size="small" onClick={clearFilters}>
+              Clear All
+            </Button>
+          </Box>
+        )}
+      </div>
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : products.length === 0 ? (
+        <div className={classes.noResults}>
+          <Typography variant="h6" color="textSecondary">
+            No products found
+          </Typography>
+          <Button color="primary" onClick={clearFilters}>
+            Clear Filters
+          </Button>
+        </div>
+      ) : (
+        <Grid container spacing={3}>
+          {products.map((product) => (
+            <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+              <ProductCard
+                product={product}
+                onAddToCart={handleAddToCart}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <div className={classes.filterDrawer}>
+          <div className={classes.filterHeader}>
+            <Typography variant="h6">Filters</Typography>
+            <IconButton onClick={() => setDrawerOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          <Divider />
+
+          <div className={classes.filterSection}>
+            <Typography variant="subtitle1" gutterBottom>
+              Category
+            </Typography>
+            <FormControl fullWidth variant="outlined">
+              <Select
+                value={filters.category}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+
+          <div className={classes.filterSection}>
+            <Typography variant="subtitle1" gutterBottom>
+              Price Range
+            </Typography>
+            <Slider
+              value={filters.priceRange}
+              onChange={(_, value) => handleFilterChange('priceRange', value)}
+              valueLabelDisplay="auto"
+              min={0}
+              max={1000}
+              className={classes.priceRange}
+            />
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2" color="textSecondary">
+                ${filters.priceRange[0]}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                ${filters.priceRange[1]}
+              </Typography>
+            </Box>
+          </div>
+
+          <div className={classes.filterSection}>
+            <FormControl fullWidth>
+              <Button
+                variant={filters.inStock ? 'contained' : 'outlined'}
+                color={filters.inStock ? 'primary' : 'default'}
+                onClick={() => handleFilterChange('inStock', !filters.inStock)}
+              >
+                In Stock Only
+              </Button>
+            </FormControl>
+          </div>
+
+          <div className={classes.filterSection}>
+            <FormControl fullWidth>
+              <Button
+                variant={filters.onSale ? 'contained' : 'outlined'}
+                color={filters.onSale ? 'primary' : 'default'}
+                onClick={() => handleFilterChange('onSale', !filters.onSale)}
+              >
+                On Sale
+              </Button>
+            </FormControl>
+          </div>
+
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={() => setDrawerOpen(false)}
+            >
+              Apply Filters
+            </Button>
+            <Button
+              variant="text"
+              fullWidth
+              onClick={clearFilters}
+              style={{ marginTop: 8 }}
+            >
+              Clear All
+            </Button>
+          </Box>
+        </div>
+      </Drawer>
+    </div>
+  );
+}
 
 export default ProductList;

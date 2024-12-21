@@ -1,200 +1,91 @@
-# Dropship E-commerce Platform
+# Dropship Platform
 
-A comprehensive dropshipping platform with AI-driven automation, real-time analytics, and advanced security features.
+A modern dropshipping platform built with React, Node.js, and MongoDB.
 
-## System Architecture
+## Features
 
-### Frontend Structure
-```
-dropship-frontend/
-├── public/
-│   ├── index.html
-│   └── service-worker.js
-└── src/
-    ├── components/
-    │   ├── AdminLayout.js
-    │   ├── Auth.js
-    │   ├── Footer.js
-    │   ├── Header.js
-    │   ├── ProductCard.js
-    │   └── TopProducts.js
-    ├── pages/
-    │   ├── AdminDashboard.js
-    │   ├── Analytics.js
-    │   ├── Automation.js
-    │   ├── Dashboard.js
-    │   ├── DataManagement.js
-    │   ├── Home.js
-    │   └── ProductList.js
-    └── services/
-        ├── performanceMonitor.js
-        └── uiService.js
-```
+- AI-driven dropshipping automation
+- Real-time analytics and reporting
+- Product management and synchronization
+- Order processing and fulfillment
+- Inventory management
+- Customer relationship management
+- Payment processing
+- Shipping integration
+- Email marketing automation
+- Social media integration
 
-### Backend Structure
-```
-dropship-backend/
-├── routes/
-│   ├── aliexpress.js
-│   ├── analytics.js
-│   ├── auth.js
-│   ├── automation.js
-│   └── dataManagement.js
-└── services/
-    ├── advancedAiService.js
-    ├── aiService.js
-    ├── aliexpressSync.js
-    ├── analyticsService.js
-    ├── automationService.js
-    ├── backupService.js
-    ├── dataManagementService.js
-    ├── dropshippingService.js
-    ├── emailMarketingService.js
-    ├── enhancedAiService.js
-    ├── enhancedSecurityService.js
-    ├── paymentService.js
-    ├── securityService.js
-    ├── shippingService.js
-    ├── socialMediaService.js
-    └── websocketService.js
-```
-
-## Core Features
-
-1. AI-Powered Automation
-   - Price optimization
-   - Inventory management
-   - Marketing automation
-   - Content generation
-
-2. Real-time Analytics
-   - Sales tracking
-   - Customer behavior analysis
-   - Performance metrics
-   - Trend analysis
-
-3. Security Features
-   - Enhanced authentication
-   - Intrusion detection
-   - WAF protection
-   - Data encryption
-
-4. Integration Capabilities
-   - Payment gateways
-   - Shipping providers
-   - Social media platforms
-   - Email marketing
-
-5. Data Management
-   - Automated backups
-   - Data import/export
-   - Version control
-   - Data recovery
-
-## Technical Requirements
+## Tech Stack
 
 ### Frontend
-- Node.js >= 14.x
-- React >= 17.x
-- Material-UI
+- React 18
+- Material-UI (MUI) v5
+- Vite
+- Socket.IO Client
+- Chart.js
+- Formik & Yup
 - Framer Motion
-- WebSocket support
 
 ### Backend
-- Node.js >= 14.x
-- Express.js
+- Node.js
+- Express
 - MongoDB
-- Redis (for caching)
-- WebSocket server
+- Redis
+- Socket.IO
+- JWT Authentication
+- Winston Logger
 
-### Infrastructure
-- SSL/TLS certificates
-- Load balancer
-- CDN integration
-- Database backups
+### DevOps
+- Docker
+- Nginx
+- GitHub Actions
 
-## Installation
+## Getting Started
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-repo/dropship-platform.git
+git clone https://github.com/yourusername/dropship-platform.git
+cd dropship-platform
 ```
 
-2. Install frontend dependencies:
+2. Install dependencies:
 ```bash
-cd dropship-frontend
-npm install
+npm run install-all
 ```
 
-3. Install backend dependencies:
+3. Set up environment variables:
 ```bash
-cd dropship-backend
-npm install
+cp dropship-backend/.env.example dropship-backend/.env
+cp dropship-frontend/.env.example dropship-frontend/.env
 ```
 
-4. Configure environment variables:
+4. Start the development environment:
 ```bash
-cp .env.example .env
-# Edit .env with your configuration
+docker-compose up --build
 ```
 
-5. Start the development servers:
-```bash
-# Frontend
-npm run dev
+The application will be available at:
+- Frontend: http://localhost
+- Backend API: http://localhost:3000
 
-# Backend
-npm run dev
-```
+## Development
 
-## Development Guidelines
+- Frontend development server: `cd dropship-frontend && npm run dev`
+- Backend development server: `cd dropship-backend && npm run dev`
+- Run tests: `npm test`
+- Build for production: `npm run build`
 
-1. Code Style
-   - Use ESLint configuration
-   - Follow Prettier formatting
-   - Maintain consistent naming conventions
+## Documentation
 
-2. Git Workflow
-   - Feature branches
-   - Pull request reviews
-   - Semantic versioning
-   - Conventional commits
+- [API Documentation](API_DOCS.md)
+- [Developer Guide](DEVELOPER_GUIDE.md)
+- [Admin Guide](ADMIN_GUIDE.md)
+- [Deployment Guide](DEPLOYMENT.md)
 
-3. Testing
-   - Unit tests
-   - Integration tests
-   - E2E tests
-   - Performance testing
+## Contributing
 
-4. Documentation
-   - Code comments
-   - API documentation
-   - Component documentation
-   - Change logs
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-## Security Considerations
+## License
 
-1. Authentication
-   - JWT tokens
-   - 2FA support
-   - Session management
-   - Rate limiting
-
-2. Data Protection
-   - Encryption at rest
-   - Encryption in transit
-   - Regular security audits
-   - Compliance checks
-
-3. Monitoring
-   - Error tracking
-   - Performance monitoring
-   - Security alerts
-   - Audit logging
-
-## Support
-
-For technical support or feature requests, please contact:
-- Email: support@dropship-platform.com
-- Documentation: docs.dropship-platform.com
-- Issue Tracker: github.com/your-repo/dropship-platform/issues
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -1,142 +1,166 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import PropTypes from 'prop-types';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { Snackbar, IconButton } from '@material-ui/core';
+import { Alert as MuiAlert } from '@material-ui/lab';
+import { Close as CloseIcon } from '@material-ui/icons';
 
-const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
-    const [isVisible, setIsVisible] = useState(true);
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  info: {
+    backgroundColor: theme.palette.info.main,
+  },
+  warning: {
+    backgroundColor: theme.palette.warning.main,
+  },
+  icon: {
+    fontSize: 20,
+  },
+  iconVariant: {
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
 
-    const typeClasses = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        warning: 'bg-yellow-500',
-        info: 'bg-blue-500'
-    };
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
-    const icons = {
-        success: '✓',
-        error: '✕',
-        warning: '⚠',
-        info: 'ℹ'
-    };
+function Toast({
+  open,
+  message,
+  severity = 'info',
+  duration = 6000,
+  onClose,
+  action,
+  position = {
+    vertical: 'bottom',
+    horizontal: 'left',
+  },
+}) {
+  const classes = useStyles();
 
-    const handleClose = useCallback(() => {
-        setIsVisible(false);
-        setTimeout(() => {
-            onClose?.();
-        }, 200);
-    }, [onClose]);
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    if (onClose) {
+      onClose();
+    }
+  };
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            handleClose();
-        }, duration);
+  const defaultAction = (
+    <IconButton
+      size="small"
+      aria-label="close"
+      color="inherit"
+      onClick={handleClose}
+    >
+      <CloseIcon fontSize="small" />
+    </IconButton>
+  );
 
-        return () => clearTimeout(timer);
-    }, [duration, handleClose]);
+  return (
+    <Snackbar
+      anchorOrigin={position}
+      open={open}
+      autoHideDuration={duration}
+      onClose={handleClose}
+    >
+      <Alert
+        onClose={handleClose}
+        severity={severity}
+        action={action || defaultAction}
+      >
+        {message}
+      </Alert>
+    </Snackbar>
+  );
+}
 
-    return (
-        <AnimatePresence>
-            {isVisible && (
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className={`
-                        fixed top-4 right-4 z-50
-                        flex items-center
-                        min-w-[300px] max-w-md
-                        p-4 rounded-lg shadow-lg
-                        text-white
-                        ${typeClasses[type]}
-                    `}
-                >
-                    <span className="mr-2 text-xl">{icons[type]}</span>
-                    <p className="flex-1">{message}</p>
-                    <button
-                        onClick={handleClose}
-                        className="ml-4 text-white hover:text-gray-200 focus:outline-none"
-                    >
-                        ✕
-                    </button>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    );
-};
-
-Toast.propTypes = {
-    message: PropTypes.string.isRequired,
-    type: PropTypes.oneOf(['success', 'error', 'warning', 'info']),
-    duration: PropTypes.number,
-    onClose: PropTypes.func
-};
-
-// Toast Container Component
-export const ToastContainer = ({ toasts, removeToast }) => {
-    return (
-        <div className="fixed top-4 right-4 z-50 space-y-4">
-            <AnimatePresence>
-                {toasts.map((toast) => (
-                    <Toast
-                        key={toast.id}
-                        {...toast}
-                        onClose={() => removeToast(toast.id)}
-                    />
-                ))}
-            </AnimatePresence>
-        </div>
-    );
-};
-
-ToastContainer.propTypes = {
-    toasts: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            message: PropTypes.string.isRequired,
-            type: PropTypes.oneOf(['success', 'error', 'warning', 'info']),
-            duration: PropTypes.number
-        })
-    ).isRequired,
-    removeToast: PropTypes.func.isRequired
-};
-
-// Toast Context and Hook
+// Toast Context for global usage
 export const ToastContext = React.createContext({
-    showToast: () => {},
-    removeToast: () => {}
+  showToast: () => {},
+  hideToast: () => {},
 });
 
-export const useToast = () => {
-    const context = React.useContext(ToastContext);
-    if (!context) {
-        throw new Error('useToast must be used within a ToastProvider');
-    }
-    return context;
+export function ToastProvider({ children }) {
+  const [toast, setToast] = React.useState({
+    open: false,
+    message: '',
+    severity: 'info',
+    duration: 6000,
+  });
+
+  const showToast = ({
+    message,
+    severity = 'info',
+    duration = 6000,
+    position,
+  }) => {
+    setToast({
+      open: true,
+      message,
+      severity,
+      duration,
+      position,
+    });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({
+      ...prev,
+      open: false,
+    }));
+  };
+
+  return (
+    <ToastContext.Provider value={{ showToast, hideToast }}>
+      {children}
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        duration={toast.duration}
+        position={toast.position}
+        onClose={hideToast}
+      />
+    </ToastContext.Provider>
+  );
+}
+
+// Custom hook for using toast
+export function useToast() {
+  const context = React.useContext(ToastContext);
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
+  return context;
+}
+
+// Helper functions for common toast types
+Toast.success = (message, options = {}) => {
+  return { message, severity: 'success', ...options };
 };
 
-// Toast Provider Component
-export const ToastProvider = ({ children }) => {
-    const [toasts, setToasts] = useState([]);
-
-    const showToast = useCallback(({ message, type = 'info', duration = 3000 }) => {
-        const id = Math.random().toString(36).substr(2, 9);
-        setToasts((currentToasts) => [...currentToasts, { id, message, type, duration }]);
-    }, []);
-
-    const removeToast = useCallback((id) => {
-        setToasts((currentToasts) => currentToasts.filter((toast) => toast.id !== id));
-    }, []);
-
-    return (
-        <ToastContext.Provider value={{ showToast, removeToast }}>
-            {children}
-            <ToastContainer toasts={toasts} removeToast={removeToast} />
-        </ToastContext.Provider>
-    );
+Toast.error = (message, options = {}) => {
+  return { message, severity: 'error', ...options };
 };
 
-ToastProvider.propTypes = {
-    children: PropTypes.node.isRequired
+Toast.info = (message, options = {}) => {
+  return { message, severity: 'info', ...options };
+};
+
+Toast.warning = (message, options = {}) => {
+  return { message, severity: 'warning', ...options };
 };
 
 export default Toast;

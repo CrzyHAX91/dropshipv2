@@ -1,62 +1,100 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import { CircularProgress, Typography, Box } from '@material-ui/core';
 
-const LoadingSpinner = ({ size = 'md', color = 'primary', fullScreen = false }) => {
-    const sizeClasses = {
-        sm: 'w-4 h-4',
-        md: 'w-8 h-8',
-        lg: 'w-12 h-12',
-        xl: 'w-16 h-16'
-    };
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '200px',
+    padding: theme.spacing(3),
+  },
+  progress: {
+    marginBottom: theme.spacing(2),
+  },
+  message: {
+    color: theme.palette.text.secondary,
+  },
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: theme.zIndex.modal + 1,
+  },
+}));
 
-    const colorClasses = {
-        primary: 'text-blue-500',
-        secondary: 'text-purple-500',
-        success: 'text-green-500',
-        warning: 'text-yellow-500',
-        error: 'text-red-500'
-    };
+function LoadingSpinner({
+  size = 40,
+  message = 'Loading...',
+  fullScreen = false,
+  color = 'primary',
+}) {
+  const classes = useStyles();
 
-    const spinnerClasses = `
-        inline-block animate-spin rounded-full 
-        border-4 border-solid border-current 
-        border-r-transparent align-[-0.125em] 
-        motion-reduce:animate-[spin_1.5s_linear_infinite]
-        ${sizeClasses[size]} 
-        ${colorClasses[color]}
-    `;
+  const content = (
+    <Box className={classes.root}>
+      <CircularProgress
+        size={size}
+        color={color}
+        className={classes.progress}
+      />
+      {message && (
+        <Typography variant="body1" className={classes.message}>
+          {message}
+        </Typography>
+      )}
+    </Box>
+  );
 
-    const spinner = (
-        <div 
-            role="status" 
-            className="inline-flex items-center justify-center"
-        >
-            <div className={spinnerClasses}>
-                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                    Loading...
-                </span>
-            </div>
-        </div>
-    );
+  if (fullScreen) {
+    return <div className={classes.overlay}>{content}</div>;
+  }
 
-    if (fullScreen) {
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-8 rounded-lg shadow-lg">
-                    {spinner}
-                    <p className="mt-4 text-gray-600">Loading...</p>
-                </div>
-            </div>
-        );
-    }
+  return content;
+}
 
-    return spinner;
-};
+// Loading states for different scenarios
+LoadingSpinner.Page = () => (
+  <LoadingSpinner
+    size={60}
+    message="Loading page content..."
+    fullScreen={true}
+  />
+);
 
-LoadingSpinner.propTypes = {
-    size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl']),
-    color: PropTypes.oneOf(['primary', 'secondary', 'success', 'warning', 'error']),
-    fullScreen: PropTypes.bool
-};
+LoadingSpinner.Data = () => (
+  <LoadingSpinner
+    size={40}
+    message="Fetching data..."
+  />
+);
+
+LoadingSpinner.Submit = () => (
+  <LoadingSpinner
+    size={30}
+    message="Processing..."
+    color="secondary"
+  />
+);
+
+LoadingSpinner.Overlay = ({ message }) => (
+  <LoadingSpinner
+    size={50}
+    message={message}
+    fullScreen={true}
+  />
+);
+
+LoadingSpinner.Inline = () => (
+  <CircularProgress size={20} />
+);
 
 export default LoadingSpinner;

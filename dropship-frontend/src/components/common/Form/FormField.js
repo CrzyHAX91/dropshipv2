@@ -1,224 +1,231 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useField } from 'formik';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  TextField,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
+  FormControlLabel,
+  Switch,
+  RadioGroup,
+  Radio,
+} from '@material-ui/core';
 
-const FormField = ({
-    label,
-    name,
-    type = 'text',
-    register,
-    error,
-    className = '',
-    required = false,
-    disabled = false,
-    placeholder = '',
-    options = [],
-    ...props
-}) => {
-    const baseInputClasses = `
-        input w-full
-        ${error ? 'input-error' : 'input-bordered'}
-        ${disabled ? 'opacity-60 cursor-not-allowed' : ''}
-    `;
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    marginBottom: theme.spacing(2),
+    minWidth: 120,
+  },
+  select: {
+    minWidth: 120,
+  },
+  helperText: {
+    marginLeft: 0,
+  },
+}));
 
-    const renderField = () => {
-        switch (type) {
-            case 'select':
-                return (
-                    <select
-                        {...register(name)}
-                        className={`select ${baseInputClasses} ${className}`}
-                        disabled={disabled}
-                        {...props}
-                    >
-                        {options.map((option) => (
-                            <option 
-                                key={option.value} 
-                                value={option.value}
-                            >
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                );
+function FormField({
+  label,
+  type = 'text',
+  options = [],
+  fullWidth = false,
+  helperText,
+  ...props
+}) {
+  const classes = useStyles();
+  const [field, meta, helpers] = useField(props);
+  const hasError = meta.touched && meta.error;
+  const errorMessage = hasError ? meta.error : '';
 
-            case 'textarea':
-                return (
-                    <textarea
-                        {...register(name)}
-                        className={`textarea ${baseInputClasses} ${className}`}
-                        placeholder={placeholder}
-                        disabled={disabled}
-                        {...props}
-                    />
-                );
+  const commonProps = {
+    ...field,
+    error: hasError,
+    helperText: errorMessage || helperText,
+    fullWidth,
+    ...props,
+  };
 
-            case 'checkbox':
-                return (
-                    <input
-                        type="checkbox"
-                        {...register(name)}
-                        className={`checkbox ${error ? 'checkbox-error' : ''} ${className}`}
-                        disabled={disabled}
-                        {...props}
-                    />
-                );
+  switch (type) {
+    case 'select':
+      return (
+        <FormControl
+          error={hasError}
+          className={classes.formControl}
+          fullWidth={fullWidth}
+        >
+          <InputLabel>{label}</InputLabel>
+          <Select
+            {...field}
+            className={classes.select}
+            {...props}
+          >
+            {options.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+          {(errorMessage || helperText) && (
+            <FormHelperText className={classes.helperText}>
+              {errorMessage || helperText}
+            </FormHelperText>
+          )}
+        </FormControl>
+      );
 
-            case 'radio':
-                return options.map((option) => (
-                    <label key={option.value} className="flex items-center space-x-2">
-                        <input
-                            type="radio"
-                            {...register(name)}
-                            value={option.value}
-                            className={`radio ${error ? 'radio-error' : ''} ${className}`}
-                            disabled={disabled}
-                            {...props}
-                        />
-                        <span>{option.label}</span>
-                    </label>
-                ));
+    case 'checkbox':
+      return (
+        <FormControl
+          error={hasError}
+          className={classes.formControl}
+          fullWidth={fullWidth}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox
+                {...field}
+                checked={field.value}
+                {...props}
+              />
+            }
+            label={label}
+          />
+          {(errorMessage || helperText) && (
+            <FormHelperText className={classes.helperText}>
+              {errorMessage || helperText}
+            </FormHelperText>
+          )}
+        </FormControl>
+      );
 
-            case 'file':
-                return (
-                    <input
-                        type="file"
-                        {...register(name)}
-                        className={`file-input ${baseInputClasses} ${className}`}
-                        disabled={disabled}
-                        {...props}
-                    />
-                );
+    case 'switch':
+      return (
+        <FormControl
+          error={hasError}
+          className={classes.formControl}
+          fullWidth={fullWidth}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                {...field}
+                checked={field.value}
+                {...props}
+              />
+            }
+            label={label}
+          />
+          {(errorMessage || helperText) && (
+            <FormHelperText className={classes.helperText}>
+              {errorMessage || helperText}
+            </FormHelperText>
+          )}
+        </FormControl>
+      );
 
-            case 'date':
-            case 'time':
-            case 'datetime-local':
-                return (
-                    <input
-                        type={type}
-                        {...register(name)}
-                        className={`${baseInputClasses} ${className}`}
-                        disabled={disabled}
-                        {...props}
-                    />
-                );
+    case 'radio':
+      return (
+        <FormControl
+          error={hasError}
+          className={classes.formControl}
+          fullWidth={fullWidth}
+        >
+          <FormLabel component="legend">{label}</FormLabel>
+          <RadioGroup {...field} {...props}>
+            {options.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={<Radio />}
+                label={option.label}
+              />
+            ))}
+          </RadioGroup>
+          {(errorMessage || helperText) && (
+            <FormHelperText className={classes.helperText}>
+              {errorMessage || helperText}
+            </FormHelperText>
+          )}
+        </FormControl>
+      );
 
-            case 'number':
-                return (
-                    <input
-                        type="number"
-                        {...register(name)}
-                        className={`${baseInputClasses} ${className}`}
-                        placeholder={placeholder}
-                        disabled={disabled}
-                        step={props.step || 'any'}
-                        {...props}
-                    />
-                );
+    case 'textarea':
+      return (
+        <TextField
+          {...commonProps}
+          label={label}
+          multiline
+          rows={4}
+        />
+      );
 
-            case 'password':
-                return (
-                    <div className="relative">
-                        <input
-                            type="password"
-                            {...register(name)}
-                            className={`${baseInputClasses} ${className}`}
-                            placeholder={placeholder}
-                            disabled={disabled}
-                            {...props}
-                        />
-                        {props.showPasswordToggle && (
-                            <button
-                                type="button"
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                                onClick={props.onTogglePassword}
-                            >
-                                <i className={`fas fa-eye${props.showPassword ? '-slash' : ''}`} />
-                            </button>
-                        )}
-                    </div>
-                );
+    default:
+      return (
+        <TextField
+          {...commonProps}
+          label={label}
+          type={type}
+        />
+      );
+  }
+}
 
-            default:
-                return (
-                    <input
-                        type={type}
-                        {...register(name)}
-                        className={`${baseInputClasses} ${className}`}
-                        placeholder={placeholder}
-                        disabled={disabled}
-                        {...props}
-                    />
-                );
-        }
-    };
+// Predefined field variants
+FormField.Email = (props) => (
+  <FormField
+    type="email"
+    label="Email"
+    autoComplete="email"
+    {...props}
+  />
+);
 
-    return (
-        <div className="form-control w-full">
-            {label && (
-                <label className="label">
-                    <span className="label-text">
-                        {label}
-                        {required && <span className="text-error ml-1">*</span>}
-                    </span>
-                </label>
-            )}
-            {renderField()}
-            {error && (
-                <label className="label">
-                    <span className="label-text-alt text-error">{error.message}</span>
-                </label>
-            )}
-            {props.hint && (
-                <label className="label">
-                    <span className="label-text-alt text-gray-500">{props.hint}</span>
-                </label>
-            )}
-        </div>
-    );
-};
+FormField.Password = (props) => (
+  <FormField
+    type="password"
+    label="Password"
+    autoComplete="current-password"
+    {...props}
+  />
+);
 
-FormField.propTypes = {
-    label: PropTypes.string,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.oneOf([
-        'text',
-        'email',
-        'password',
-        'number',
-        'tel',
-        'url',
-        'date',
-        'time',
-        'datetime-local',
-        'select',
-        'textarea',
-        'checkbox',
-        'radio',
-        'file'
-    ]),
-    register: PropTypes.func.isRequired,
-    error: PropTypes.object,
-    className: PropTypes.string,
-    required: PropTypes.bool,
-    disabled: PropTypes.bool,
-    placeholder: PropTypes.string,
-    options: PropTypes.arrayOf(
-        PropTypes.shape({
-            value: PropTypes.oneOfType([
-                PropTypes.string,
-                PropTypes.number
-            ]).isRequired,
-            label: PropTypes.string.isRequired
-        })
-    ),
-    hint: PropTypes.string,
-    showPasswordToggle: PropTypes.bool,
-    showPassword: PropTypes.bool,
-    onTogglePassword: PropTypes.func,
-    step: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number
-    ])
-};
+FormField.Search = (props) => (
+  <FormField
+    type="search"
+    label="Search"
+    {...props}
+  />
+);
+
+FormField.Phone = (props) => (
+  <FormField
+    type="tel"
+    label="Phone"
+    autoComplete="tel"
+    {...props}
+  />
+);
+
+FormField.Date = (props) => (
+  <FormField
+    type="date"
+    label="Date"
+    InputLabelProps={{ shrink: true }}
+    {...props}
+  />
+);
+
+FormField.Time = (props) => (
+  <FormField
+    type="time"
+    label="Time"
+    InputLabelProps={{ shrink: true }}
+    {...props}
+  />
+);
 
 export default FormField;

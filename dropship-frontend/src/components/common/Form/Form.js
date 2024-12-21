@@ -1,90 +1,172 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import LoadingSpinner from '../LoadingSpinner';
+import { makeStyles } from '@material-ui/core/styles';
+import { Paper, Button, CircularProgress } from '@material-ui/core';
+import { Formik, Form as FormikForm } from 'formik';
 
-const Form = ({
-    onSubmit,
-    schema,
-    children,
-    defaultValues = {},
-    className = '',
-    loading = false,
-    submitButton = 'Submit',
-    resetButton = false
-}) => {
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors, isSubmitting }
-    } = useForm({
-        resolver: schema ? yupResolver(schema) : undefined,
-        defaultValues
-    });
+const useStyles = makeStyles((theme) => ({
+  form: {
+    padding: theme.spacing(3),
+  },
+  actions: {
+    marginTop: theme.spacing(3),
+    display: 'flex',
+    justifyContent: 'flex-end',
+    '& > button': {
+      marginLeft: theme.spacing(1),
+    },
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
+  wrapper: {
+    margin: theme.spacing(1),
+    position: 'relative',
+  },
+}));
 
-    const processSubmit = async (data) => {
-        try {
-            await onSubmit(data);
-        } catch (error) {
-            console.error('Form submission error:', error);
-        }
-    };
+function Form({
+  initialValues,
+  validationSchema,
+  onSubmit,
+  children,
+  submitText = 'Submit',
+  cancelText = 'Cancel',
+  onCancel,
+  loading = false,
+  disabled = false,
+  showCancel = true,
+  elevation = 1,
+  className,
+  submitButtonProps = {},
+  cancelButtonProps = {},
+}) {
+  const classes = useStyles();
 
-    return (
-        <form 
-            onSubmit={handleSubmit(processSubmit)} 
-            className={`space-y-6 ${className}`}
-            noValidate
-        >
-            {/* Render form fields with register */}
-            {typeof children === 'function' 
-                ? children({ register, errors }) 
-                : children
-            }
-
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-4">
-                {resetButton && (
-                    <button
-                        type="button"
-                        onClick={() => reset(defaultValues)}
-                        className="btn btn-outline"
-                        disabled={isSubmitting || loading}
-                    >
-                        Reset
-                    </button>
-                )}
-                <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isSubmitting || loading}
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={onSubmit}
+      enableReinitialize
+    >
+      {(formikProps) => (
+        <Paper elevation={elevation} className={classes.form}>
+          <FormikForm className={className}>
+            {typeof children === 'function' ? children(formikProps) : children}
+            
+            <div className={classes.actions}>
+              {showCancel && (
+                <Button
+                  onClick={onCancel}
+                  disabled={loading || disabled}
+                  {...cancelButtonProps}
                 >
-                    {(isSubmitting || loading) ? (
-                        <LoadingSpinner size="sm" color="white" />
-                    ) : submitButton}
-                </button>
+                  {cancelText}
+                </Button>
+              )}
+              <div className={classes.wrapper}>
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  disabled={loading || disabled || !formikProps.isValid || !formikProps.dirty}
+                  {...submitButtonProps}
+                >
+                  {submitText}
+                </Button>
+                {loading && (
+                  <CircularProgress size={24} className={classes.buttonProgress} />
+                )}
+              </div>
             </div>
-        </form>
-    );
-};
+          </FormikForm>
+        </Paper>
+      )}
+    </Formik>
+  );
+}
 
-Form.propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    schema: PropTypes.object,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.func
-    ]).isRequired,
-    defaultValues: PropTypes.object,
-    className: PropTypes.string,
-    loading: PropTypes.bool,
-    submitButton: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.node
-    ]),
-    resetButton: PropTypes.bool
-};
+// Form variants for common use cases
+Form.Login = ({
+  onSubmit,
+  loading,
+  initialValues = { email: '', password: '' },
+  ...props
+}) => (
+  <Form
+    initialValues={initialValues}
+    validationSchema={loginValidationSchema}
+    onSubmit={onSubmit}
+    loading={loading}
+    submitText="Login"
+    showCancel={false}
+    {...props}
+  >
+    <FormField
+      name="email"
+      label="Email"
+      type="email"
+      autoComplete="email"
+      fullWidth
+    />
+    <FormField
+      name="password"
+      label="Password"
+      type="password"
+      autoComplete="current-password"
+      fullWidth
+    />
+  </Form>
+);
+
+Form.Search = ({
+  onSubmit,
+  loading,
+  initialValues = { query: '' },
+  ...props
+}) => (
+  <Form
+    initialValues={initialValues}
+    onSubmit={onSubmit}
+    loading={loading}
+    submitText="Search"
+    showCancel={false}
+    {...props}
+  >
+    <FormField
+      name="query"
+      label="Search"
+      fullWidth
+      InputProps={{
+        endAdornment: loading && (
+          <CircularProgress color="inherit" size={20} />
+        ),
+      }}
+    />
+  </Form>
+);
+
+Form.Filter = ({
+  onSubmit,
+  loading,
+  filters,
+  initialValues = {},
+  ...props
+}) => (
+  <Form
+    initialValues={initialValues}
+    onSubmit={onSubmit}
+    loading={loading}
+    submitText="Apply Filters"
+    cancelText="Reset"
+    {...props}
+  >
+    {filters}
+  </Form>
+);
 
 export default Form;

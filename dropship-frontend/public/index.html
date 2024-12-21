@@ -5,91 +5,20 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    
-    <!-- Performance optimization meta tags -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Dropship Admin Dashboard - Manage your dropshipping business efficiently">
-    <meta name="keywords" content="dropshipping, ecommerce, admin, dashboard">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    
-    <!-- Preconnect to important domains -->
-    <link rel="preconnect" href="https://api.aliexpress.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    
-    <!-- Preload critical assets -->
-    <link rel="preload" href="%PUBLIC_URL%/images/bg.png" as="image">
-    <link rel="preload" href="%PUBLIC_URL%/static/js/main.chunk.js" as="script">
-
-    <title>Dropship Admin Dashboard</title>
+    <meta
+      name="description"
+      content="Dropship Platform - AI-driven dropshipping solution"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <title>Dropship Platform</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful');
-              
-              // Request notification permission
-              if ('Notification' in window) {
-                Notification.requestPermission();
-              }
-              
-              // Handle service worker updates
-              registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New content is available, show update notification
-                    if (confirm('New version available! Would you like to update?')) {
-                      window.location.reload();
-                    }
-                  }
-                });
-              });
-            })
-            .catch(error => {
-              console.error('ServiceWorker registration failed:', error);
-            });
-        });
-      }
-    </script>
-
-    <!-- Performance monitoring -->
-    <script>
-      // Monitor page load performance
-      window.addEventListener('load', () => {
-        if ('performance' in window) {
-          const timing = performance.getEntriesByType('navigation')[0];
-          if (timing) {
-            console.log('Page Load Metrics:', {
-              'DNS Lookup': timing.domainLookupEnd - timing.domainLookupStart,
-              'Connection Time': timing.connectEnd - timing.connectStart,
-              'First Byte': timing.responseStart - timing.requestStart,
-              'DOM Interactive': timing.domInteractive,
-              'DOM Complete': timing.domComplete,
-              'Load Event': timing.loadEventEnd - timing.loadEventStart,
-              'Total Time': timing.loadEventEnd
-            });
-          }
-        }
-      });
-
-      // Monitor memory usage
-      setInterval(() => {
-        if ('memory' in performance) {
-          console.log('Memory Usage:', {
-            'Used JS Heap': Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB',
-            'Total JS Heap': Math.round(performance.memory.totalJSHeapSize / 1048576) + 'MB',
-            'JS Heap Limit': Math.round(performance.memory.jsHeapSizeLimit / 1048576) + 'MB'
-          });
-        }
-      }, 30000);
-    </script>
   </body>
 </html>

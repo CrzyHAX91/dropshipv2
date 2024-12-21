@@ -1,352 +1,300 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  Box,
+  Tabs,
+  Tab,
+  IconButton,
+  Menu,
+  MenuItem,
+} from '@material-ui/core';
+import {
+  Refresh as RefreshIcon,
+  MoreVert as MoreVertIcon,
+  CloudDownload as ExportIcon,
+  Settings as SettingsIcon,
+} from '@material-ui/icons';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { useToast } from '../components/common/Toast';
+import TopProducts from '../components/TopProducts';
 
-const AdminDashboard = () => {
-    const [orders, setOrders] = useState([]);
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState('overview');
-    const [realTimeStats, setRealTimeStats] = useState({
-        activeUsers: 0,
-        recentOrders: [],
-        salesVelocity: 0,
-        topProducts: []
-    });
-    
-    const ws = useRef(null);
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing(3),
+  },
+  paper: {
+    padding: theme.spacing(3),
+    height: '100%',
+  },
+  tabPanel: {
+    marginTop: theme.spacing(3),
+  },
+  chart: {
+    height: 300,
+  },
+  statCard: {
+    padding: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  statValue: {
+    fontSize: '2rem',
+    fontWeight: 500,
+    marginBottom: theme.spacing(1),
+  },
+  statLabel: {
+    color: theme.palette.text.secondary,
+  },
+  actionButton: {
+    marginLeft: theme.spacing(1),
+  },
+}));
 
-    // Initialize WebSocket connection
-    useEffect(() => {
-        ws.current = new WebSocket('ws://localhost:3000');
+function TabPanel({ children, value, index }) {
+  return value === index && <div>{children}</div>;
+}
 
-        ws.current.onopen = () => {
-            console.log('WebSocket connected');
-            // Subscribe to relevant topics
-            ws.current.send(JSON.stringify({
-                type: 'subscribe',
-                topics: ['sales', 'inventory', 'analytics']
-            }));
-        };
+function AdminDashboard() {
+  const classes = useStyles();
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [stats, setStats] = useState({
+    revenue: 0,
+    orders: 0,
+    customers: 0,
+    products: 0,
+    metrics: {
+      conversion: 0,
+      aov: 0,
+      retention: 0,
+    },
+    inventory: {
+      lowStock: 0,
+      outOfStock: 0,
+      total: 0,
+    },
+  });
 
-        ws.current.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            handleWebSocketMessage(message);
-        };
-
-        ws.current.onerror = (error) => {
-            console.error('WebSocket error:', error);
-            toast.error('Real-time connection error');
-        };
-
-        ws.current.onclose = () => {
-            console.log('WebSocket disconnected');
-            // Attempt to reconnect after 5 seconds
-            setTimeout(() => {
-                if (ws.current) {
-                    ws.current.close();
-                }
-                initializeWebSocket();
-            }, 5000);
-        };
-
-        return () => {
-            if (ws.current) {
-                ws.current.close();
-            }
-        };
-    }, []);
-
-    const handleWebSocketMessage = (message) => {
-        switch (message.type) {
-            case 'sale':
-                // Handle new sale notification
-                toast.success(`New order: $${message.data.amount} from ${message.data.customer}`);
-                fetchOrders(); // Refresh orders list
-                break;
-
-            case 'inventory_alert':
-                // Handle inventory alerts
-                message.data.items.forEach(item => {
-                    toast.warning(`Low stock alert: ${item.name} (${item.stock} remaining)`);
-                });
-                break;
-
-            case 'analytics_update':
-                // Update real-time statistics
-                setRealTimeStats(message.data);
-                break;
-
-            default:
-                console.log('Unknown message type:', message.type);
-        }
-    };
-
-    const fetchStats = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/api/stats/profit');
-            if (!response.ok) throw new Error('Failed to fetch statistics');
-            const data = await response.json();
-            setStats(data);
-        } catch (err) {
-            setError(err.message);
-            toast.error('Error fetching statistics');
-        }
-    };
-
-    const fetchOrders = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/api/orders');
-            if (!response.ok) throw new Error('Failed to fetch orders');
-            const data = await response.json();
-            setOrders(data);
-            setLoading(false);
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-            toast.error('Error fetching orders');
-        }
-    };
-
-    useEffect(() => {
-        fetchStats();
-        fetchOrders();
-        fetchRealTimeAnalytics();
-    }, []);
-
-    const fetchRealTimeAnalytics = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/api/analytics/realtime');
-            if (!response.ok) throw new Error('Failed to fetch analytics');
-            const data = await response.json();
-            setRealTimeStats(data);
-        } catch (err) {
-            console.error('Error fetching real-time analytics:', err);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[400px]">
-                <div className="loading loading-spinner loading-lg"></div>
-            </div>
-        );
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // TODO: Replace with actual API call
+      const response = await fetch('/api/admin/dashboard');
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      showToast({
+        message: 'Error fetching dashboard data',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold text-center mb-8 text-gradient">Admin Dashboard</h1>
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-            {/* Real-time Status Bar */}
-            <div className="bg-base-200 p-4 rounded-box mb-8">
-                <div className="flex flex-wrap justify-between items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <div className="badge badge-success gap-2">
-                            <span className="animate-pulse">●</span> Live
-                        </div>
-                        <span className="text-sm">
-                            {realTimeStats.activeUsers} active users
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm">
-                            Sales Velocity: ${realTimeStats.salesVelocity}/hour
-                        </span>
-                        <span className="text-sm">
-                            Recent Orders: {realTimeStats.recentOrders.length}
-                        </span>
-                    </div>
-                </div>
-            </div>
+  const handleRefresh = () => {
+    fetchDashboardData();
+  };
 
-            {/* Tab Navigation */}
-            <div className="tabs tabs-boxed justify-center mb-8">
-                <button 
-                    className={`tab ${activeTab === 'overview' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('overview')}
-                >
-                    Overview
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'orders' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('orders')}
-                >
-                    Orders
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'inventory' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('inventory')}
-                >
-                    Inventory
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'analytics' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('analytics')}
-                >
-                    Analytics
-                </button>
-            </div>
+  const handleExport = () => {
+    showToast({
+      message: 'Exporting dashboard data...',
+      severity: 'info',
+    });
+  };
 
-            {/* Overview Tab */}
-            {activeTab === 'overview' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="stat bg-base-100 shadow rounded-box">
-                        <div className="stat-title">Total Revenue</div>
-                        <div className="stat-value text-primary">${stats?.total.toFixed(2)}</div>
-                        <div className="stat-desc">All time</div>
-                    </div>
-                    <div className="stat bg-base-100 shadow rounded-box">
-                        <div className="stat-title">Active Orders</div>
-                        <div className="stat-value text-secondary">
-                            {orders.filter(order => order.status === 'processing').length}
-                        </div>
-                        <div className="stat-desc">Being processed</div>
-                    </div>
-                    <div className="stat bg-base-100 shadow rounded-box">
-                        <div className="stat-title">Today's Profit</div>
-                        <div className="stat-value text-accent">
-                            ${stats?.daily[new Date().toISOString().split('T')[0]]?.toFixed(2) || '0.00'}
-                        </div>
-                        <div className="stat-desc">Last 24 hours</div>
-                    </div>
-                </div>
-            )}
+  const handleMenuOpen = (event) => {
+    setMenuAnchor(event.currentTarget);
+  };
 
-            {/* Orders Tab */}
-            {activeTab === 'orders' && (
-                <div className="overflow-x-auto">
-                    <table className="table w-full">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Items</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Tracking</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orders.map((order) => (
-                                <tr key={order.orderId} className="hover">
-                                    <td>{order.orderId}</td>
-                                    <td>{new Date(order.date).toLocaleDateString()}</td>
-                                    <td>{order.customer}</td>
-                                    <td>{order.items.length} items</td>
-                                    <td>${order.total.toFixed(2)}</td>
-                                    <td>
-                                        <span className={`badge ${
-                                            order.status === 'completed' ? 'badge-success' :
-                                            order.status === 'processing' ? 'badge-warning' :
-                                            'badge-error'
-                                        }`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {order.trackingNumber ? (
-                                            <a 
-                                                href={`https://track.aliexpress.com/${order.trackingNumber}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="link link-primary"
-                                            >
-                                                {order.trackingNumber}
-                                            </a>
-                                        ) : (
-                                            'Pending'
-                                        )}
-                                    </td>
-                                    <td>
-                                        <div className="dropdown dropdown-end">
-                                            <label tabIndex={0} className="btn btn-ghost btn-xs">
-                                                <i className="fas fa-ellipsis-v"></i>
-                                            </label>
-                                            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-                                                <li><a>View Details</a></li>
-                                                <li><a>Contact Customer</a></li>
-                                                <li><a>Cancel Order</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
 
-            {/* Analytics Tab */}
-            {activeTab === 'analytics' && (
-                <div className="grid gap-6">
-                    {/* Top Products */}
-                    <div className="bg-base-100 p-6 rounded-box shadow">
-                        <h3 className="text-xl font-bold mb-4">Top Products</h3>
-                        <div className="overflow-x-auto">
-                            <table className="table w-full">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Sales</th>
-                                        <th>Revenue</th>
-                                        <th>Trend</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {realTimeStats.topProducts.map((product, index) => (
-                                        <tr key={index}>
-                                            <td>{product.name}</td>
-                                            <td>{product.sales}</td>
-                                            <td>${product.revenue.toFixed(2)}</td>
-                                            <td>
-                                                <span className={`text-${product.trend > 0 ? 'success' : 'error'}`}>
-                                                    {product.trend > 0 ? '↑' : '↓'} {Math.abs(product.trend)}%
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
-                    {/* Recent Activity */}
-                    <div className="bg-base-100 p-6 rounded-box shadow">
-                        <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
-                        <div className="space-y-4">
-                            {realTimeStats.recentOrders.map((order, index) => (
-                                <div key={index} className="flex justify-between items-center p-4 bg-base-200 rounded-lg">
-                                    <div>
-                                        <p className="font-semibold">Order #{order.orderId}</p>
-                                        <p className="text-sm opacity-70">{order.customer}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-bold">${order.total.toFixed(2)}</p>
-                                        <p className="text-sm opacity-70">
-                                            {new Date(order.timestamp).toLocaleTimeString()}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {error && (
-                <div className="alert alert-error shadow-lg">
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>{error}</span>
-                    </div>
-                </div>
-            )}
+  return (
+    <div className={classes.root}>
+      <div className={classes.header}>
+        <Typography variant="h4">Admin Dashboard</Typography>
+        <div>
+          <Button
+            startIcon={<ExportIcon />}
+            onClick={handleExport}
+            className={classes.actionButton}
+          >
+            Export
+          </Button>
+          <IconButton onClick={handleRefresh} className={classes.actionButton}>
+            <RefreshIcon />
+          </IconButton>
+          <IconButton onClick={handleMenuOpen} className={classes.actionButton}>
+            <MoreVertIcon />
+          </IconButton>
         </div>
-    );
-};
+
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem onClick={handleMenuClose}>
+            <SettingsIcon fontSize="small" style={{ marginRight: 8 }} />
+            Dashboard Settings
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>Customize View</MenuItem>
+          <MenuItem onClick={handleMenuClose}>Manage Notifications</MenuItem>
+        </Menu>
+      </div>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.statCard}>
+            <Typography className={classes.statValue}>
+              ${stats.revenue.toLocaleString()}
+            </Typography>
+            <Typography className={classes.statLabel}>Total Revenue</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.statCard}>
+            <Typography className={classes.statValue}>
+              {stats.orders.toLocaleString()}
+            </Typography>
+            <Typography className={classes.statLabel}>Total Orders</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.statCard}>
+            <Typography className={classes.statValue}>
+              {stats.customers.toLocaleString()}
+            </Typography>
+            <Typography className={classes.statLabel}>Total Customers</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.statCard}>
+            <Typography className={classes.statValue}>
+              {stats.products.toLocaleString()}
+            </Typography>
+            <Typography className={classes.statLabel}>Total Products</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Box mt={4}>
+        <Paper>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            indicatorColor="primary"
+            textColor="primary"
+          >
+            <Tab label="Performance" />
+            <Tab label="Inventory" />
+            <Tab label="Top Products" />
+          </Tabs>
+
+          <div className={classes.tabPanel}>
+            <TabPanel value={activeTab} index={0}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h6" gutterBottom>
+                      Conversion Rate
+                    </Typography>
+                    <Typography variant="h3">
+                      {stats.metrics.conversion}%
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h6" gutterBottom>
+                      Average Order Value
+                    </Typography>
+                    <Typography variant="h3">
+                      ${stats.metrics.aov}
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h6" gutterBottom>
+                      Customer Retention
+                    </Typography>
+                    <Typography variant="h3">
+                      {stats.metrics.retention}%
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </TabPanel>
+
+            <TabPanel value={activeTab} index={1}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h6" gutterBottom>
+                      Low Stock Items
+                    </Typography>
+                    <Typography variant="h3" color="error">
+                      {stats.inventory.lowStock}
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h6" gutterBottom>
+                      Out of Stock
+                    </Typography>
+                    <Typography variant="h3" color="error">
+                      {stats.inventory.outOfStock}
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h6" gutterBottom>
+                      Total SKUs
+                    </Typography>
+                    <Typography variant="h3">
+                      {stats.inventory.total}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </TabPanel>
+
+            <TabPanel value={activeTab} index={2}>
+              <TopProducts />
+            </TabPanel>
+          </div>
+        </Paper>
+      </Box>
+    </div>
+  );
+}
 
 export default AdminDashboard;

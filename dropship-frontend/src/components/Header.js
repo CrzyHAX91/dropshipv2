@@ -1,71 +1,156 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Navigation from './Navigation';
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Badge,
+} from '@material-ui/core';
+import {
+  Notifications as NotificationsIcon,
+  AccountCircle,
+  Dashboard as DashboardIcon,
+} from '@material-ui/icons';
 
-const Header = () => {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+    textDecoration: 'none',
+    color: 'inherit',
+  },
+  navLink: {
+    marginLeft: theme.spacing(2),
+    color: 'inherit',
+    textDecoration: 'none',
+  },
+  toolbar: {
+    justifyContent: 'space-between',
+  },
+  leftSection: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  rightSection: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
 
-    return (
-        <header className="bg-image py-4 relative">
-            <div className="container mx-auto px-4">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <Link to="/" className="text-white text-3xl font-bold flex items-center">
-                            <i className="fas fa-box-open mr-2"></i>
-                            DropShop
-                        </Link>
-                    </div>
+function Header() {
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [notificationsAnchor, setNotificationsAnchor] = React.useState(null);
 
-                    {/* Desktop Navigation */}
-                    <Navigation />
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-                    {/* Mobile Menu Button */}
-                    <div className="md:hidden">
-                        <button 
-                            className="btn btn-ghost text-white"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        >
-                            <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
-                        </button>
-                    </div>
-                </div>
+  const handleNotifications = (event) => {
+    setNotificationsAnchor(event.currentTarget);
+  };
 
-                {/* Mobile Menu */}
-                {isMobileMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 right-0 bg-gray-800 shadow-lg py-4 px-4 z-50">
-                        <div className="flex flex-col space-y-4">
-                            <Link 
-                                to="/dashboard" 
-                                className="text-white hover:text-pink-400 flex items-center"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <i className="fas fa-chart-line mr-2"></i>
-                                Dashboard
-                            </Link>
-                            <Link 
-                                to="/products" 
-                                className="text-white hover:text-pink-400 flex items-center"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <i className="fas fa-store mr-2"></i>
-                                Products
-                            </Link>
-                            <div className="flex flex-col space-y-2">
-                                <span className="badge badge-success inline-flex items-center w-fit">
-                                    <i className="fas fa-robot mr-1"></i>
-                                    Automated
-                                </span>
-                                <button className="btn btn-primary btn-gradient rounded-full w-full">
-                                    <i className="fas fa-user mr-2"></i>
-                                    Login
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </header>
-    );
-};
+  const handleClose = () => {
+    setAnchorEl(null);
+    setNotificationsAnchor(null);
+  };
+
+  return (
+    <div className={classes.root}>
+      <AppBar position="fixed">
+        <Toolbar className={classes.toolbar}>
+          <div className={classes.leftSection}>
+            <Typography
+              variant="h6"
+              component={RouterLink}
+              to="/"
+              className={classes.title}
+            >
+              Dropship Platform
+            </Typography>
+            <Button
+              color="inherit"
+              component={RouterLink}
+              to="/dashboard"
+              startIcon={<DashboardIcon />}
+            >
+              Dashboard
+            </Button>
+            <Button color="inherit" component={RouterLink} to="/products">
+              Products
+            </Button>
+            <Button color="inherit" component={RouterLink} to="/analytics">
+              Analytics
+            </Button>
+          </div>
+          
+          <div className={classes.rightSection}>
+            <IconButton color="inherit" onClick={handleNotifications}>
+              <Badge badgeContent={4} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <IconButton
+              edge="end"
+              aria-label="account of current user"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </div>
+
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem component={RouterLink} to="/profile" onClick={handleClose}>
+              Profile
+            </MenuItem>
+            <MenuItem component={RouterLink} to="/settings" onClick={handleClose}>
+              Settings
+            </MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
+
+          <Menu
+            id="notifications-menu"
+            anchorEl={notificationsAnchor}
+            keepMounted
+            open={Boolean(notificationsAnchor)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>New Order #1234</MenuItem>
+            <MenuItem onClick={handleClose}>Low Stock Alert</MenuItem>
+            <MenuItem onClick={handleClose}>Price Update</MenuItem>
+            <MenuItem onClick={handleClose}>System Update</MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
+}
 
 export default Header;

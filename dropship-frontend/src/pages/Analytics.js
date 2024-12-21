@@ -1,297 +1,322 @@
 import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import {
-    LineChart, Line, BarChart, Bar, PieChart, Pie,
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    ResponsiveContainer, Cell
-} from 'recharts';
-import { toast } from 'react-toastify';
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  ButtonGroup,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Menu,
+  MenuItem,
+} from '@material-ui/core';
+import {
+  TrendingUp,
+  TrendingDown,
+  MoreVert as MoreVertIcon,
+  GetApp as DownloadIcon,
+  Print as PrintIcon,
+  Share as ShareIcon,
+} from '@material-ui/icons';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { useToast } from '../components/common/Toast';
 
-const Analytics = () => {
-    const [reportType, setReportType] = useState('sales');
-    const [timeFrame, setTimeFrame] = useState('monthly');
-    const [customDateRange, setCustomDateRange] = useState({
-        startDate: '',
-        endDate: ''
-    });
-    const [reportData, setReportData] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('overview');
-    const [exportFormat, setExportFormat] = useState('csv');
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing(3),
+  },
+  paper: {
+    padding: theme.spacing(3),
+    height: '100%',
+  },
+  chart: {
+    height: 300,
+    marginTop: theme.spacing(2),
+  },
+  metricCard: {
+    padding: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  metricValue: {
+    fontSize: '2rem',
+    fontWeight: 500,
+    marginBottom: theme.spacing(1),
+  },
+  trendUp: {
+    color: theme.palette.success.main,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  trendDown: {
+    color: theme.palette.error.main,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  periodSelector: {
+    marginBottom: theme.spacing(3),
+  },
+}));
 
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const periods = ['Today', 'Week', 'Month', 'Quarter', 'Year'];
 
-    useEffect(() => {
-        fetchReportData();
-    }, [reportType, timeFrame]);
+function Analytics() {
+  const classes = useStyles();
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState('Month');
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [analytics, setAnalytics] = useState({
+    revenue: {
+      value: 0,
+      trend: 0,
+    },
+    orders: {
+      value: 0,
+      trend: 0,
+    },
+    customers: {
+      value: 0,
+      trend: 0,
+    },
+    conversion: {
+      value: 0,
+      trend: 0,
+    },
+    topProducts: [],
+    customerSegments: [],
+  });
 
-    const fetchReportData = async () => {
-        try {
-            setIsLoading(true);
-            const response = await fetch('http://localhost:3000/api/analytics/report', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    type: reportType,
-                    timeFrame,
-                    ...customDateRange
-                })
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch report data');
-
-            const data = await response.json();
-            setReportData(data);
-        } catch (error) {
-            toast.error('Error fetching report data: ' + error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleExport = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/api/analytics/export', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    type: reportType,
-                    format: exportFormat,
-                    data: reportData
-                })
-            });
-
-            if (!response.ok) throw new Error('Export failed');
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `report.${exportFormat}`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-
-            toast.success('Report exported successfully');
-        } catch (error) {
-            toast.error('Export failed: ' + error.message);
-        }
-    };
-
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[400px]">
-                <div className="loading loading-spinner loading-lg"></div>
-            </div>
-        );
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      // TODO: Replace with actual API call
+      const response = await fetch(`/api/analytics?period=${selectedPeriod.toLowerCase()}`);
+      const data = await response.json();
+      setAnalytics(data);
+    } catch (error) {
+      showToast({
+        message: 'Error fetching analytics data',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
+    fetchAnalytics();
+  }, [selectedPeriod]);
+
+  const handleExport = (format) => {
+    showToast({
+      message: `Exporting analytics as ${format}...`,
+      severity: 'info',
+    });
+    setMenuAnchor(null);
+  };
+
+  const renderTrend = (value) => {
+    if (value > 0) {
+      return (
+        <span className={classes.trendUp}>
+          <TrendingUp fontSize="small" style={{ marginRight: 4 }} />
+          {value}%
+        </span>
+      );
+    }
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">Analytics Dashboard</h1>
-
-            {/* Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <select 
-                    className="select select-bordered w-full"
-                    value={reportType}
-                    onChange={(e) => setReportType(e.target.value)}
-                >
-                    <option value="sales">Sales Analytics</option>
-                    <option value="inventory">Inventory Analytics</option>
-                    <option value="customers">Customer Analytics</option>
-                    <option value="products">Product Analytics</option>
-                    <option value="marketing">Marketing Analytics</option>
-                    <option value="financial">Financial Analytics</option>
-                </select>
-
-                <select 
-                    className="select select-bordered w-full"
-                    value={timeFrame}
-                    onChange={(e) => setTimeFrame(e.target.value)}
-                >
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="quarterly">Quarterly</option>
-                    <option value="yearly">Yearly</option>
-                    <option value="custom">Custom Range</option>
-                </select>
-
-                {timeFrame === 'custom' && (
-                    <>
-                        <input
-                            type="date"
-                            className="input input-bordered"
-                            value={customDateRange.startDate}
-                            onChange={(e) => setCustomDateRange({
-                                ...customDateRange,
-                                startDate: e.target.value
-                            })}
-                        />
-                        <input
-                            type="date"
-                            className="input input-bordered"
-                            value={customDateRange.endDate}
-                            onChange={(e) => setCustomDateRange({
-                                ...customDateRange,
-                                endDate: e.target.value
-                            })}
-                        />
-                    </>
-                )}
-            </div>
-
-            {/* Tabs */}
-            <div className="tabs tabs-boxed mb-8">
-                <button 
-                    className={`tab ${activeTab === 'overview' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('overview')}
-                >
-                    Overview
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'details' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('details')}
-                >
-                    Detailed Analysis
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'trends' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('trends')}
-                >
-                    Trends
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'predictions' ? 'tab-active' : ''}`}
-                    onClick={() => setActiveTab('predictions')}
-                >
-                    Predictions
-                </button>
-            </div>
-
-            {reportData && (
-                <div className="grid grid-cols-1 gap-8">
-                    {/* Overview Tab */}
-                    {activeTab === 'overview' && (
-                        <>
-                            {/* Summary Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                {reportData.summary.metrics.map((metric, index) => (
-                                    <div key={index} className="stat bg-base-100 shadow rounded-box">
-                                        <div className="stat-title">{metric.label}</div>
-                                        <div className="stat-value text-primary">{metric.value}</div>
-                                        <div className="stat-desc">
-                                            {metric.change > 0 ? '↗︎' : '↘︎'} {Math.abs(metric.change)}%
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Main Chart */}
-                            <div className="bg-base-100 p-6 rounded-box shadow-lg">
-                                <h3 className="text-xl font-bold mb-4">Trend Overview</h3>
-                                <div className="h-[400px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={reportData.overview.trendData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="date" />
-                                            <YAxis />
-                                            <Tooltip />
-                                            <Legend />
-                                            <Line 
-                                                type="monotone" 
-                                                dataKey="value" 
-                                                stroke="#8884d8" 
-                                                activeDot={{ r: 8 }} 
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    {/* Detailed Analysis Tab */}
-                    {activeTab === 'details' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Bar Chart */}
-                            <div className="bg-base-100 p-6 rounded-box shadow-lg">
-                                <h3 className="text-xl font-bold mb-4">Detailed Breakdown</h3>
-                                <div className="h-[400px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={reportData.details.breakdownData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="name" />
-                                            <YAxis />
-                                            <Tooltip />
-                                            <Legend />
-                                            <Bar dataKey="value" fill="#8884d8" />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-
-                            {/* Pie Chart */}
-                            <div className="bg-base-100 p-6 rounded-box shadow-lg">
-                                <h3 className="text-xl font-bold mb-4">Distribution</h3>
-                                <div className="h-[400px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={reportData.details.distributionData}
-                                                dataKey="value"
-                                                nameKey="name"
-                                                cx="50%"
-                                                cy="50%"
-                                                outerRadius={150}
-                                                label
-                                            >
-                                                {reportData.details.distributionData.map((entry, index) => (
-                                                    <Cell 
-                                                        key={`cell-${index}`} 
-                                                        fill={COLORS[index % COLORS.length]} 
-                                                    />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip />
-                                            <Legend />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Export Controls */}
-                    <div className="flex justify-end gap-4 mt-8">
-                        <select 
-                            className="select select-bordered"
-                            value={exportFormat}
-                            onChange={(e) => setExportFormat(e.target.value)}
-                        >
-                            <option value="csv">CSV</option>
-                            <option value="excel">Excel</option>
-                            <option value="pdf">PDF</option>
-                            <option value="json">JSON</option>
-                        </select>
-                        <button 
-                            className="btn btn-primary"
-                            onClick={handleExport}
-                        >
-                            Export Report
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+      <span className={classes.trendDown}>
+        <TrendingDown fontSize="small" style={{ marginRight: 4 }} />
+        {Math.abs(value)}%
+      </span>
     );
-};
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <div className={classes.root}>
+      <div className={classes.header}>
+        <Typography variant="h4">Analytics</Typography>
+        <div>
+          <IconButton onClick={(e) => setMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={menuAnchor}
+            open={Boolean(menuAnchor)}
+            onClose={() => setMenuAnchor(null)}
+          >
+            <MenuItem onClick={() => handleExport('pdf')}>
+              <DownloadIcon fontSize="small" style={{ marginRight: 8 }} />
+              Export as PDF
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('csv')}>
+              <DownloadIcon fontSize="small" style={{ marginRight: 8 }} />
+              Export as CSV
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('print')}>
+              <PrintIcon fontSize="small" style={{ marginRight: 8 }} />
+              Print Report
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('share')}>
+              <ShareIcon fontSize="small" style={{ marginRight: 8 }} />
+              Share Report
+            </MenuItem>
+          </Menu>
+        </div>
+      </div>
+
+      <ButtonGroup className={classes.periodSelector}>
+        {periods.map((period) => (
+          <Button
+            key={period}
+            variant={selectedPeriod === period ? 'contained' : 'outlined'}
+            color={selectedPeriod === period ? 'primary' : 'default'}
+            onClick={() => setSelectedPeriod(period)}
+          >
+            {period}
+          </Button>
+        ))}
+      </ButtonGroup>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.metricCard}>
+            <Typography variant="subtitle2" color="textSecondary">
+              Revenue
+            </Typography>
+            <Typography className={classes.metricValue}>
+              ${analytics.revenue.value.toLocaleString()}
+            </Typography>
+            {renderTrend(analytics.revenue.trend)}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.metricCard}>
+            <Typography variant="subtitle2" color="textSecondary">
+              Orders
+            </Typography>
+            <Typography className={classes.metricValue}>
+              {analytics.orders.value.toLocaleString()}
+            </Typography>
+            {renderTrend(analytics.orders.trend)}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.metricCard}>
+            <Typography variant="subtitle2" color="textSecondary">
+              New Customers
+            </Typography>
+            <Typography className={classes.metricValue}>
+              {analytics.customers.value.toLocaleString()}
+            </Typography>
+            {renderTrend(analytics.customers.trend)}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper className={classes.metricCard}>
+            <Typography variant="subtitle2" color="textSecondary">
+              Conversion Rate
+            </Typography>
+            <Typography className={classes.metricValue}>
+              {analytics.conversion.value}%
+            </Typography>
+            {renderTrend(analytics.conversion.trend)}
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper className={classes.paper}>
+            <Typography variant="h6" gutterBottom>
+              Top Performing Products
+            </Typography>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Product</TableCell>
+                    <TableCell align="right">Revenue</TableCell>
+                    <TableCell align="right">Orders</TableCell>
+                    <TableCell align="right">Trend</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {analytics.topProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell align="right">
+                        ${product.revenue.toLocaleString()}
+                      </TableCell>
+                      <TableCell align="right">
+                        {product.orders.toLocaleString()}
+                      </TableCell>
+                      <TableCell align="right">
+                        {renderTrend(product.trend)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper className={classes.paper}>
+            <Typography variant="h6" gutterBottom>
+              Customer Segments
+            </Typography>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Segment</TableCell>
+                    <TableCell align="right">Customers</TableCell>
+                    <TableCell align="right">Revenue</TableCell>
+                    <TableCell align="right">Growth</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {analytics.customerSegments.map((segment) => (
+                    <TableRow key={segment.id}>
+                      <TableCell>{segment.name}</TableCell>
+                      <TableCell align="right">
+                        {segment.customers.toLocaleString()}
+                      </TableCell>
+                      <TableCell align="right">
+                        ${segment.revenue.toLocaleString()}
+                      </TableCell>
+                      <TableCell align="right">
+                        {renderTrend(segment.growth)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+      </Grid>
+    </div>
+  );
+}
 
 export default Analytics;

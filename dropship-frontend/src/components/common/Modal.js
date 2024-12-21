@@ -1,179 +1,209 @@
-import React, { useEffect, useCallback } from 'react';
-import PropTypes from 'prop-types';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@material-ui/core';
+import { Close as CloseIcon } from '@material-ui/icons';
 
-const Modal = ({
-    isOpen,
-    onClose,
-    title,
-    children,
-    size = 'md',
-    showClose = true,
-    closeOnOverlayClick = true,
-    footer,
-    className = ''
-}) => {
-    const sizeClasses = {
-        xs: 'max-w-xs',
-        sm: 'max-w-sm',
-        md: 'max-w-md',
-        lg: 'max-w-lg',
-        xl: 'max-w-xl',
-        '2xl': 'max-w-2xl',
-        '3xl': 'max-w-3xl',
-        '4xl': 'max-w-4xl',
-        '5xl': 'max-w-5xl',
-        full: 'max-w-full mx-4'
-    };
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiDialog-paper': {
+      minWidth: '300px',
+    },
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: theme.spacing(1, 2),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  title: {
+    margin: 0,
+    padding: theme.spacing(1, 0),
+  },
+  content: {
+    padding: theme.spacing(2),
+    '&:first-child': {
+      paddingTop: theme.spacing(2),
+    },
+  },
+  actions: {
+    padding: theme.spacing(1, 2),
+    borderTop: `1px solid ${theme.palette.divider}`,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500],
+  },
+  fullScreen: {
+    '& .MuiDialog-paper': {
+      margin: 0,
+      maxHeight: '100%',
+      height: '100%',
+      borderRadius: 0,
+    },
+  },
+}));
 
-    const handleEscape = useCallback((event) => {
-        if (event.key === 'Escape' && isOpen) {
-            onClose();
-        }
-    }, [isOpen, onClose]);
+function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  actions,
+  maxWidth = 'sm',
+  fullWidth = false,
+  fullScreen: forcedFullScreen = false,
+  disableBackdropClick = false,
+  disableEscapeKeyDown = false,
+  showCloseButton = true,
+  className,
+  ...props
+}) {
+  const classes = useStyles();
+  const theme = useTheme();
+  const fullScreenBreakpoint = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = forcedFullScreen || fullScreenBreakpoint;
 
-    useEffect(() => {
-        document.addEventListener('keydown', handleEscape);
-        return () => {
-            document.removeEventListener('keydown', handleEscape);
-        };
-    }, [handleEscape]);
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth={maxWidth}
+      fullWidth={fullWidth}
+      fullScreen={fullScreen}
+      className={`${classes.root} ${fullScreen ? classes.fullScreen : ''} ${className || ''}`}
+      disableBackdropClick={disableBackdropClick}
+      disableEscapeKeyDown={disableEscapeKeyDown}
+      {...props}
+    >
+      {title && (
+        <DialogTitle disableTypography className={classes.header}>
+          <Typography variant="h6" className={classes.title}>
+            {title}
+          </Typography>
+          {showCloseButton && (
+            <IconButton
+              aria-label="close"
+              className={classes.closeButton}
+              onClick={onClose}
+              size="small"
+            >
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogTitle>
+      )}
 
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isOpen]);
+      <DialogContent className={classes.content} dividers>
+        {children}
+      </DialogContent>
 
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 z-50 overflow-y-auto">
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-                        onClick={closeOnOverlayClick ? onClose : undefined}
-                        aria-hidden="true"
-                    />
+      {actions && <DialogActions className={classes.actions}>{actions}</DialogActions>}
+    </Dialog>
+  );
+}
 
-                    {/* Modal */}
-                    <div className="flex min-h-screen items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            transition={{
-                                type: 'spring',
-                                stiffness: 300,
-                                damping: 30
-                            }}
-                            className={`
-                                relative bg-white dark:bg-gray-800 
-                                rounded-lg shadow-xl overflow-hidden 
-                                w-full ${sizeClasses[size]} ${className}
-                            `}
-                            onClick={(e) => e.stopPropagation()}
-                            role="dialog"
-                            aria-modal="true"
-                            aria-labelledby="modal-title"
-                        >
-                            {/* Header */}
-                            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                <div className="flex items-center justify-between">
-                                    <h3 
-                                        id="modal-title"
-                                        className="text-lg font-semibold text-gray-900 dark:text-white"
-                                    >
-                                        {title}
-                                    </h3>
-                                    {showClose && (
-                                        <button
-                                            onClick={onClose}
-                                            className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 
-                                                     focus:outline-none focus:ring-2 focus:ring-blue-500 
-                                                     rounded-full p-1 transition-colors duration-200"
-                                            aria-label="Close modal"
-                                        >
-                                            <svg
-                                                className="h-6 w-6"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
+// Predefined modal variants
+Modal.Confirm = ({
+  open,
+  onClose,
+  onConfirm,
+  title = 'Confirm Action',
+  message,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  confirmColor = 'primary',
+  ...props
+}) => (
+  <Modal
+    open={open}
+    onClose={onClose}
+    title={title}
+    actions={
+      <>
+        <Button onClick={onClose}>{cancelText}</Button>
+        <Button color={confirmColor} onClick={onConfirm} autoFocus>
+          {confirmText}
+        </Button>
+      </>
+    }
+    maxWidth="xs"
+    {...props}
+  >
+    <Typography>{message}</Typography>
+  </Modal>
+);
 
-                            {/* Content */}
-                            <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-                                {children}
-                            </div>
+Modal.Alert = ({
+  open,
+  onClose,
+  title = 'Alert',
+  message,
+  buttonText = 'OK',
+  ...props
+}) => (
+  <Modal
+    open={open}
+    onClose={onClose}
+    title={title}
+    actions={
+      <Button onClick={onClose} color="primary" autoFocus>
+        {buttonText}
+      </Button>
+    }
+    maxWidth="xs"
+    {...props}
+  >
+    <Typography>{message}</Typography>
+  </Modal>
+);
 
-                            {/* Footer */}
-                            {footer && (
-                                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                                    {footer}
-                                </div>
-                            )}
-                        </motion.div>
-                    </div>
-                </div>
-            )}
-        </AnimatePresence>
-    );
-};
-
-Modal.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
-    size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', 'full']),
-    showClose: PropTypes.bool,
-    closeOnOverlayClick: PropTypes.bool,
-    footer: PropTypes.node,
-    className: PropTypes.string
-};
-
-// Example usage:
-// const YourComponent = () => {
-//     const [isOpen, setIsOpen] = useState(false);
-//
-//     return (
-//         <>
-//             <button onClick={() => setIsOpen(true)}>Open Modal</button>
-//             <Modal
-//                 isOpen={isOpen}
-//                 onClose={() => setIsOpen(false)}
-//                 title="Example Modal"
-//                 footer={
-//                     <div className="flex justify-end space-x-4">
-//                         <button onClick={() => setIsOpen(false)}>Cancel</button>
-//                         <button onClick={() => {/* handle confirm */}}>Confirm</button>
-//                     </div>
-//                 }
-//             >
-//                 <p>Modal content goes here</p>
-//             </Modal>
-//         </>
-//     );
-// };
+Modal.Form = ({
+  open,
+  onClose,
+  title,
+  children,
+  onSubmit,
+  submitText = 'Submit',
+  cancelText = 'Cancel',
+  submitColor = 'primary',
+  loading = false,
+  ...props
+}) => (
+  <Modal
+    open={open}
+    onClose={onClose}
+    title={title}
+    actions={
+      <>
+        <Button onClick={onClose} disabled={loading}>
+          {cancelText}
+        </Button>
+        <Button
+          color={submitColor}
+          onClick={onSubmit}
+          disabled={loading}
+          startIcon={loading && <CircularProgress size={20} />}
+        >
+          {submitText}
+        </Button>
+      </>
+    }
+    {...props}
+  >
+    {children}
+  </Modal>
+);
 
 export default Modal;

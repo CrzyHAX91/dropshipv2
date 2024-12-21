@@ -1,130 +1,197 @@
 import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Card,
+  CardContent,
+  IconButton,
+  Box,
+} from '@material-ui/core';
+import {
+  TrendingUp,
+  ShoppingCart,
+  AttachMoney,
+  Inventory,
+  Refresh as RefreshIcon,
+} from '@material-ui/icons';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { useToast } from '../components/common/Toast';
+import TopProducts from '../components/TopProducts';
 
-const Dashboard = () => {
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(3),
+    height: '100%',
+  },
+  card: {
+    height: '100%',
+  },
+  statValue: {
+    fontSize: '2rem',
+    fontWeight: 500,
+    marginBottom: theme.spacing(1),
+  },
+  statLabel: {
+    color: theme.palette.text.secondary,
+  },
+  trendUp: {
+    color: theme.palette.success.main,
+  },
+  trendDown: {
+    color: theme.palette.error.main,
+  },
+  iconContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  icon: {
+    fontSize: 40,
+    opacity: 0.7,
+  },
+  refreshButton: {
+    marginLeft: 'auto',
+  },
+}));
 
-    useEffect(() => {
-        fetchStats();
-        const interval = setInterval(fetchStats, 300000); // Update every 5 minutes
-        return () => clearInterval(interval);
-    }, []);
+const StatCard = ({ title, value, icon: Icon, trend, loading }) => {
+  const classes = useStyles();
 
-    const fetchStats = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/api/stats/profit');
-            if (!response.ok) {
-                throw new Error('Failed to fetch statistics');
-            }
-            const data = await response.json();
-            setStats(data);
-            setLoading(false);
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[400px]">
-                <div className="loading loading-spinner loading-lg"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="alert alert-error shadow-lg max-w-2xl mx-auto">
-                <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{error}</span>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold text-center mb-8 text-gradient">Business Dashboard</h1>
-            
-            {/* Profit Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="stat bg-base-100 shadow rounded-box">
-                    <div className="stat-title">Total Profit</div>
-                    <div className="stat-value text-primary">${stats?.total.toFixed(2)}</div>
-                    <div className="stat-desc">Since starting</div>
-                </div>
-                
-                <div className="stat bg-base-100 shadow rounded-box">
-                    <div className="stat-title">Monthly Profit</div>
-                    <div className="stat-value text-secondary">
-                        ${Object.values(stats?.monthly || {}).pop()?.toFixed(2) || '0.00'}
-                    </div>
-                    <div className="stat-desc">Current month</div>
-                </div>
-                
-                <div className="stat bg-base-100 shadow rounded-box">
-                    <div className="stat-title">Average Order Profit</div>
-                    <div className="stat-value text-accent">${stats?.averageOrderProfit.toFixed(2)}</div>
-                    <div className="stat-desc">Per order</div>
-                </div>
-            </div>
-
-            {/* Automation Status */}
-            <div className="bg-base-100 shadow rounded-box p-6 mb-8">
-                <h2 className="text-2xl font-bold mb-4">Automation Status</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2">
-                        <div className="badge badge-success badge-lg">Active</div>
-                        <span>Order Processing</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="badge badge-success badge-lg">Active</div>
-                        <span>Inventory Sync</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="badge badge-success badge-lg">Active</div>
-                        <span>Price Optimization</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="badge badge-success badge-lg">Active</div>
-                        <span>Profit Tracking</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-base-100 shadow rounded-box p-6">
-                <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
-                <div className="overflow-x-auto">
-                    <table className="table w-full">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Details</th>
-                                <th>Profit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.entries(stats?.daily || {}).reverse().slice(0, 5).map(([date, profit]) => (
-                                <tr key={date}>
-                                    <td>{new Date(date).toLocaleDateString()}</td>
-                                    <td>Sales</td>
-                                    <td>Daily Summary</td>
-                                    <td className="text-success">${profit.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <div className={classes.iconContainer}>
+          <Icon className={classes.icon} color="primary" />
         </div>
-    );
+        {loading ? (
+          <LoadingSpinner size={20} />
+        ) : (
+          <>
+            <Typography variant="h4" className={classes.statValue}>
+              {value}
+            </Typography>
+            <Typography variant="body2" className={classes.statLabel}>
+              {title}
+            </Typography>
+            {trend && (
+              <Typography
+                variant="body2"
+                className={trend > 0 ? classes.trendUp : classes.trendDown}
+              >
+                {trend > 0 ? '+' : ''}{trend}% from last month
+              </Typography>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
 };
+
+function Dashboard() {
+  const classes = useStyles();
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    revenue: 0,
+    orders: 0,
+    products: 0,
+    profit: 0,
+  });
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // TODO: Replace with actual API call
+      const response = await fetch('/api/dashboard/stats');
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      showToast({
+        message: 'Error fetching dashboard data',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleRefresh = () => {
+    fetchDashboardData();
+  };
+
+  return (
+    <div className={classes.root}>
+      <Box mb={3} display="flex" alignItems="center">
+        <Typography variant="h4" component="h1">
+          Dashboard
+        </Typography>
+        <IconButton
+          className={classes.refreshButton}
+          onClick={handleRefresh}
+          disabled={loading}
+        >
+          <RefreshIcon />
+        </IconButton>
+      </Box>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Revenue"
+            value={`$${stats.revenue.toLocaleString()}`}
+            icon={AttachMoney}
+            trend={12.5}
+            loading={loading}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Orders"
+            value={stats.orders}
+            icon={ShoppingCart}
+            trend={8.2}
+            loading={loading}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Products"
+            value={stats.products}
+            icon={Inventory}
+            loading={loading}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Net Profit"
+            value={`$${stats.profit.toLocaleString()}`}
+            icon={TrendingUp}
+            trend={15.8}
+            loading={loading}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <Typography variant="h6" gutterBottom>
+              Top Performing Products
+            </Typography>
+            <TopProducts />
+          </Paper>
+        </Grid>
+      </Grid>
+    </div>
+  );
+}
 
 export default Dashboard;

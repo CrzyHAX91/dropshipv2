@@ -1,0 +1,24 @@
+{
+  "name": "dropship-platform",
+  "version": "1.0.0",
+  "description": "Dropshipping platform with frontend and backend services",
+  "scripts": {
+    "start": "concurrently \"cd dropship-backend && npm start\" \"cd dropship-frontend && npm start\"",
+    "install-all": "npm install && cd dropship-backend && npm install && cd ../dropship-frontend && npm install",
+    "build": "cd dropship-backend && npm run build && cd ../dropship-frontend && npm run build",
+    "test": "cd dropship-backend && npm test && cd ../dropship-frontend && npm test",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "core-js": "^3.33.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
