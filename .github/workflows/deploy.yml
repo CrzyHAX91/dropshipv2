@@ -1,4 +1,4 @@
-name: Deploy Dropship Platform
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,48 +7,138 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: |
+        npm ci
+        cd dropship-frontend && npm ci
+        cd ../dropship-backend && npm ci
+        cd ..
+
+    - name: Run Tests
+      run: |
+        npm test
+        cd dropship-frontend && npm test
+        cd ../dropship-backend && npm test
+        cd ..
+
+    - name: Run Linting
+      run: |
+        cd dropship-frontend && npm run lint
+        cd ../dropship-backend && npm run lint
+        cd ..
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v3
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
     - name: Build and push Frontend
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v4
       with:
         context: ./dropship-frontend
         push: true
-        tags: ghcr.io/${{ github.repository }}/frontend:latest
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dropship-frontend:latest
+        cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/dropship-frontend:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/dropship-frontend:buildcache,mode=max
 
     - name: Build and push Backend
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v4
       with:
         context: ./dropship-backend
         push: true
-        tags: ghcr.io/${{ github.repository }}/backend:latest
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dropship-backend:latest
+        cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/dropship-backend:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/dropship-backend:buildcache,mode=max
 
-    - name: Deploy to server
-      if: github.ref == 'refs/heads/main'
-      env:
-        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-      run: |
-        mkdir -p ~/.ssh
-        echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST '
-          cd /opt/dropship &&
-          docker-compose pull &&
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Deploy to Production
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_KEY }}
+        script: |
+          cd /opt/dropship
+          docker-compose pull
           docker-compose up -d
-        '
+          docker system prune -f
+
+  security:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run Security Scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        command: monitor
+
+    - name: Run OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'Dropship Platform'
+        path: '.'
+        format: 'HTML'
+        args: >
+          --suppression ./.dependency-check-suppression.xml
+          --failOnCVSS 7
+          --enableRetired
+
+    - name: Upload Security Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: Security Reports
+        path: |
+          dependency-check-report.html
+          snyk-report.json
+
+  notify:
+    needs: [deploy, security]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always()

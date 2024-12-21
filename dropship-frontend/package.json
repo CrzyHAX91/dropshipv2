@@ -2,6 +2,16 @@
   "name": "dropship-frontend",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "lint": "eslint src --ext .js,.jsx",
+    "lint:fix": "eslint src --ext .js,.jsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,css,scss}\"",
+    "analyze": "vite build --mode analyze"
+  },
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -24,11 +34,20 @@
     "web-vitals": "^3.5.0",
     "yup": "^1.3.3"
   },
-  "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "serve": "vite preview",
-    "test": "vitest"
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.7",
+    "vitest": "^1.0.4",
+    "@testing-library/react": "^14.1.2",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.1.1",
+    "rollup-plugin-visualizer": "^5.11.0",
+    "@vitest/coverage-v8": "^1.0.4",
+    "jsdom": "^23.0.1"
   },
   "browserslist": {
     "production": [
@@ -41,14 +60,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.7",
-    "vitest": "^1.0.4",
-    "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "prettier": "^3.1.1"
   }
 }
