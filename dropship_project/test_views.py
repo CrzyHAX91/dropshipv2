@@ -39,7 +39,7 @@ class ViewsTestCase(TestCase):
         response = self.client.get(reverse('user_dashboard'))
         self.assertRedirects(response, f'{reverse("account_login")}?next={reverse("user_dashboard")}')
 
-    def test_login_required_profile(self):    
+    def test_login_required_profile(self):
         response = self.client.get(reverse('user_profile'))
         self.assertRedirects(response, f'{reverse("account_login")}?next={reverse("user_profile")}')
-
+</write_to_file>

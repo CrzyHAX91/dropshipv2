@@ -62,12 +62,12 @@ WSGI_APPLICATION = 'dropship_project.wsgi.application'
 
 DATABASES = {
     'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': os.getenv('POSTGRES_DB', 'your_db_name'),
-    'USER': os.getenv('POSTGRES_USER', 'your_db_user'),
-    'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'your_db_password'),
-    'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-    'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'your_db_name'),
+        'USER': os.getenv('POSTGRES_USER', 'your_db_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'your_db_password'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -103,9 +103,11 @@ ALIEXPRESS_APP_SECRET = os.getenv('ALIEXPRESS_APP_SECRET')
 CLOUDFLARE_API_TOKEN = os.getenv('CLOUDFLARE_API_TOKEN')
 CLOUDFLARE_ZONE_ID = os.getenv('CLOUDFLARE_ZONE_ID')
 CLOUDFLARE_EMAIL = os.getenv('CLOUDFLARE_EMAIL')
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
+</write_to_file>

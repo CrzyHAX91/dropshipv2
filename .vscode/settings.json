@@ -1,0 +1,9 @@
+{
+    "workbench.editor.defaultBinaryEditor": "jupyter-notebook",
+    "python.analysis.autoImportCompletions": true,
+    "cmake.useCMakePresets": "always",
+    "cSpell.words": [
+        "aliexpress"
+    ],
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+}

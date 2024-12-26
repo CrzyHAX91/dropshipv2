@@ -1,12 +1,12 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import login
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.db.models import F, Sum
 from .models import Product, CartItem, Order
-from .aliexpress_integration import sync_products, get_product_details, search_products
+from .aliexpress_integration import sync_products
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import View
-from django.views.decorators.http import require_GET
 
 def is_admin(user):
     return user.is_staff or user.is_superuser
@@ -71,28 +71,8 @@ class AdminDashboardView(AdminRequiredMixin, View):
 
 class SyncAliexpressProductsView(AdminRequiredMixin, View):
     def post(self, request):
-        try:
-            sync_products()
-            return JsonResponse({'status': 'success', 'message': 'Products synced successfully'})
-        except Exception as e:
-            logger.error(f"Error syncing products: {str(e)}")
-            return JsonResponse({'status': 'error', 'message': 'Failed to sync products'}, status=500)
+        sync_products()
         return JsonResponse({'status': 'success', 'message': 'Products synced successfully'})
-
-@require_GET
-@login_required
-def get_product_details_view(request, product_id):
-    """View to fetch product details."""
-    product_details = get_product_details(product_id)
-    return JsonResponse(product_details)
-
-@require_GET
-@login_required
-def search_products_view(request):
-    """View to search for products based on keywords."""
-    keywords = request.GET.get('keywords', '')
-    products = search_products(keywords)
-    return JsonResponse(products, safe=False)
 
 class HelpdeskView(View):
     def get(self, request):
@@ -104,29 +84,6 @@ class HelpdeskView(View):
         return JsonResponse({'response': response})
 
 def generate_response(query):
-    logger.info('Generating response for query: %s', query)
     # Placeholder function for generating AI responses
     return "This is a placeholder response for your query: " + query
-
-# Create a logger
-logger = logging.getLogger(__name__)
-
-# Set the logging level
-logger.setLevel(logging.INFO)
-
-# Create a file handler
-file_handler = logging.FileHandler('app.log')
-file_handler.setLevel(logging.INFO)
-
-# Create a console handler
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-
-# Create a formatter and set it for the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-console_handler.setFormatter(formatter)
-
-# Add the handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
+</write_to_file>

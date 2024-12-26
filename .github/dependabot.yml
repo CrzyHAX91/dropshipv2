@@ -1,0 +1,21 @@
+# Dependabot configuration for version updates
+# Specify package ecosystems and their respective locations for manifests.
+
+version: 2
+
+# Define the package manager and its configuration
+updates:
+  - package-ecosystem: "pip"  # Use pip as the package manager
+    directory: "/"  # Location of the directory containing package manifests
+    schedule:
+      interval: "daily"  # Check for updates daily
+      time: "02:00"  # Perform updates at 2 AM UTC
+      timezone: "UTC"  # Use the UTC timezone for updates
+    labels: ["dependencies"]  # Optional: add a label to updates
+    assignees: ["username"]  # Optional: assign updates to a specific user
+    commit-message:
+      prefix: "fix"  # Optional: prefix for commit messages
+    # Optional: specify dependencies to ignore for updates
+    ignore:
+      - dependency-name: "some-package"  # Replace with the actual package name
+        versions: ["<2.0.0"]  # Specify version constraints to ignore

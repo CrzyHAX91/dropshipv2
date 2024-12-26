@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Dropship V2{% endblock %}
+
+{% block content %}
+<h1>User Dashboard</h1>
+<p>Welcome to your dashboard. Here you can view your recent orders and account summary.</p>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Recent Orders</h2>
+        <!-- Add a list of recent orders here -->
+        <ul>
+            <li>Order #12345 - Placed on 2023-11-24</li>
+            <li>Order #12346 - Placed on 2023-11-23</li>
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h2>Account Summary</h2>
+        <!-- Add account summary information here -->
+        <p>Total Orders: 10</p>
+        <p>Total Spent: 00</p>
+    </div>
+</div>
+{% endblock %}

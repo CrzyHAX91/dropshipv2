@@ -67,3 +67,4 @@ def search_products(keywords):
     """Search for products on AliExpress based on keywords."""
     products = api.search_products(keywords=keywords, page_size=20)
     return products
+</write_to_file>
