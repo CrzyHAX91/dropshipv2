@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpdesk</title>
+</head>
+<body>
+    <h1>Helpdesk</h1>
+    <form id="helpdesk-form">
+        <label for="message">Your Message:</label>
+        <textarea id="message" name="message" required></textarea>
+        <button type="submit">Send</button>
+    </form>
+    <div id="response"></div>
+    <script>
+        document.getElementById('helpdesk-form').onsubmit = async function(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            const responseDiv = document.getElementById('response');
+
+            const res = await fetch("{% url 'helpdesk_api' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message }),
+            });
+
+            const data = await res.json();
+            responseDiv.innerText = data.response || data.error;
+        };
+    </script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 import os
 from aliexpress_api import AliexpressApi, AliexpressCategory
 from .models import Product
@@ -58,3 +57,14 @@ def place_order(order):
             order.save()
             return True
     return False
+
+def get_product_details(product_id):
+    """Fetch product details from AliExpress API."""
+    product_details = api.get_product_details(product_id)
+    return product_details
+
+def search_products(keywords):
+    """Search for products on AliExpress based on keywords."""
+    products = api.search_products(keywords=keywords, page_size=20)
+    return products
+</write_to_file>

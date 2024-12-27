@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from .aliexpress_integration import place_aliexpress_order
 
 class CustomUser(AbstractUser):
+    """Custom user model extending the default AbstractUser."""
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -12,6 +13,11 @@ class Product(models.Model):
     description = models.TextField()
     cost_price = models.DecimalField(max_digits=10, decimal_places=2)
     selling_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def clean(self):
+        """Ensure that selling_price is greater than cost_price."""
+        if self.selling_price <= self.cost_price:
+            raise models.ValidationError("Selling price must be greater than cost price.")
     stock = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     aliexpress_url = models.URLField(blank=True, null=True)
@@ -55,3 +61,4 @@ class Order(models.Model):
         self.status = 'processing'
         self.save()
         return True
+</write_to_file>

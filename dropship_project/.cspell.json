@@ -1,0 +1,14 @@
+{
+  "version": "0.2",
+  // This configuration file is used by cSpell to define custom words
+  "words": [
+    "dotenv",
+    "dropship",
+    "allauth",
+    "socialaccount",
+    "levelname",
+    "wsgi",
+    "csvfile",
+    "ALIEXPRESS"
+  ]
+}
