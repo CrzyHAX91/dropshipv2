@@ -128,4 +128,7 @@ def post_product(request):
             response = post_product_with_forecasting(api_key, product_details)
             return JsonResponse(response, status=200)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error("Error in post_product: %s", str(e))
+            return JsonResponse({"error": "An internal error has occurred."}, status=400)
