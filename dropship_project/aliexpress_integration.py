@@ -17,10 +17,9 @@ def sync_products():
     )
 
     for product in products:
-        # Check if the product already exists in our database
-        existing_product = Product.objects.filter(aliexpress_url=product['productUrl']).first()
-
-        if existing_product:
+        if existing_product := Product.objects.filter(
+            aliexpress_url=product['productUrl']
+        ).first():
             # Update existing product
             existing_product.name = product['productTitle']
             existing_product.selling_price = float(product['salePrice']['amount'])
