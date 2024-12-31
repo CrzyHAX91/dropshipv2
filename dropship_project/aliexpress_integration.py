@@ -9,6 +9,7 @@ APP_SECRET = os.environ.get('ALIEXPRESS_APP_SECRET')
 api = AliexpressApi(APP_KEY, APP_SECRET)
 
 def sync_products():
+    """Fetch products from AliExpress API and update or create Product instances."""
     # Fetch products from AliExpress API
     products = api.get_product_list(
         fields="productId,productTitle,productUrl,imageUrl,salePrice",
@@ -36,6 +37,7 @@ def sync_products():
             new_product.save()
 
 def place_order(order):
+    """Place an order on AliExpress based on the items in the order."""
     # This is a simplified example. In a real-world scenario, you'd need to handle
     # shipping addresses, payment confirmation, etc.
     for item in order.items.all():

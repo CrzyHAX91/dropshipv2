@@ -9,6 +9,7 @@ class CustomUser(AbstractUser):
     date_of_birth = models.DateField(blank=True, null=True)
 
 class Product(models.Model):
+    """Model representing a product in the store."""
     name = models.CharField(max_length=200)
     description = models.TextField()
     cost_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -26,6 +27,7 @@ class Product(models.Model):
         return self.name
 
 class CartItem(models.Model):
+    """Model representing an item in the shopping cart."""
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
@@ -34,6 +36,7 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
 class Order(models.Model):
+    """Model representing an order placed by a user."""
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('processing', 'Processing'),

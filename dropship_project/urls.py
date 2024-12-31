@@ -1,3 +1,4 @@
+"""URL configuration for the Dropship application."""
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings

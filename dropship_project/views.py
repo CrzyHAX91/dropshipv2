@@ -16,11 +16,13 @@ class AdminRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_staff or self.request.user.is_superuser
 
 class ProductListView(View):
+    """View for listing all products."""
     def get(self, request):
         products = Product.objects.all()
         return render(request, 'product_list.html', {'products': products})
 
 class ProductDetailView(View):
+    """View for displaying the details of a specific product."""
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         return render(request, 'product_detail.html', {'product': product})
