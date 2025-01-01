@@ -1,76 +1,1052 @@
-{% extends "admin/base_site.html" %}
-{% load i18n static %}
-
-{% block extrastyle %}
-{{ block.super }}
-<style>
-    .dashboard-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-    .dashboard-card {
-        flex-basis: calc(50% - 20px);
-        margin-bottom: 20px;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .dashboard-card h2 {
-        color: #007bff;
-        margin-top: 0;
-    }
-    .dashboard-card p {
-        font-size: 24px;
-        font-weight: bold;
-    }
-    .admin-actions {
-        margin-top: 20px;
-    }
-    .admin-actions a {
-        display: inline-block;
-        margin-right: 10px;
-        padding: 10px 15px;
-        background-color: #007bff;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-    .admin-actions a:hover {
-        background-color: #0056b3;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div id="content-main">
-    <h1>{% trans 'Dropship Admin Dashboard' %}</h1>
-    <div class="dashboard-container">
-        <div class="dashboard-card">
-            <h2>{% trans 'Total Users' %}</h2>
-            <p>{{ user_count }}</p>
-        </div>
-        <div class="dashboard-card">
-            <h2>{% trans 'Total Products' %}</h2>
-            <p>{{ product_count }}</p>
-        </div>
-        <div class="dashboard-card">
-            <h2>{% trans 'Total Orders' %}</h2>
-            <p>{{ order_count }}</p>
-        </div>
-        <div class="dashboard-card">
-            <h2>{% trans 'Recent Orders' %}</h2>
-            <ul>
-                {% for order in recent_orders %}
-                    <li>Order #{{ order.id }} - {{ order.user.username }} - ${{ order.total_price }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    <div class="admin-actions">
-        <a href="{% url 'admin:order_stats' %}">{% trans 'View Order Statistics' %}</a>
-    </div>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+ <meta charset="utf-8"/>
+ <meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+ <meta name="Generator" content="Xara HTML filter v.10.0.5.73"/>
+ <meta name="XAR Files" content="index_html_files/xr_files.txt"/>
+ <title>Xara Web Designer</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <link rel="preload" href="index_html_files/xr_fonts.css?0" as="style" onload="this.onload = null; this.rel = 'stylesheet'" />
+ <script>document.documentElement.className="xr_bgh0";</script>
+ <link rel="preload" href="index_html_files/highslide.css" as="style" onload="this.onload = null; this.rel = 'stylesheet'" />
+ <!--[if lt IE 7]><link rel="stylesheet" href="index_html_files/highslide-ie6.css" /><![endif]-->
+ <script async src="index_html_files/highslide.js"></script>
+ <link rel="stylesheet" href="index_html_files/xr_main.css?0"/>
+ <link rel="preload" href="index_html_files/custom_styles.css?0" as="style" onload="this.onload = null; this.rel = 'stylesheet'" />
+ <link rel="preload" href="index_html_files/xr_text.css?0" as="style" onload="this.onload = null; this.rel = 'stylesheet'" />
+ <script src="index_html_files/roe.js?0"></script>
+ <script src="index_html_files/prs4.js"></script>
+ <style id="xr_scstrchs">.xr_scstrch{width:100%;left:0%;z-index:-1;}</style>
+ <script>xr_fitwidth=1280;xr_fws=1.50</script>
+ <link rel="stylesheet" href="index_html_files/xr_all.css?0" id="xr_mvcss"/>
+ <!--[if lt IE 9]><link rel="stylesheet" href="index_html_files/xr_ie.css?0"/><![endif]-->
+ <script> var xr_multivar=1;xr_ios_ini2();</script>
+ <style>
+  @media screen and (min-width: 880px) {#xr_xr {top:0px;}}
+  @media screen and (max-width: 879px) {#xr_xr {top:0px;}}
+ </style>
+ <link rel="preload" href="index_html_files/ani.css" as="style" onload="this.onload = null; this.rel = 'stylesheet'" />
+</head>
+<body class="xr_bgb0">
+<!--[if IE]><div class="xr_ap" id="xr_xrii"  style="width: 100%; height: 100%; top:0%; left:0%;"><![endif]-->
+<!--[if !IE]><!--><div class="xr_ap" id="xr_xrii"  style="width: 100%; height: 100%; top:0%; left:0%; overflow:hidden;"><!--<![endif]-->
+<div class="xr_ap" id="xr_bph" style="width: 100%; height: 100%; left: 0px; top: 0px; overflow: hidden;">
+<div class="xr_ar xr_mvp_2 xr_mvpo " style="width: 100%; height: 100%;">
+<div class="xr_pbd">
 </div>
-{% endblock %}
+</div>
+</div>
+<!--[if gte IE 9]><!-->
+<div id="xr_xr" class="xr_noc" style="position:relative; text-align:left; margin:0 auto;" onmousedown="xr_mm(event);">
+<!--<![endif]-->
+<!--[if lt IE 9]>
+<div class="xr_ap" id="xr_xr" style="width: 1280px; height: 10330px; left:50%; margin-left: -640px; text-align: left; top:0px;">
+<![endif]-->
+ <script>var xr_xr=document.getElementById("xr_xr");xr_rxc();</script>
+<div id="xr_td" class="xr_td">
+<div id="xr_mvp_1" class="xr_mvp_1 xr_bgn_0_0_0" style="position:absolute; width:1280px; height:10330px;">
+<div class="xr_ap xr_xri_" style="width: 1280px; height: 10330px;">
+<div class="xr_group">
+<div id="rectangle" style="position:absolute; left:0px; top:0px"></div>
+ <span class="xr_ar xr_scstrch" style="height: 700px; top: 0px; position: absolute; background-color: #311567;"></span>
+</div>
+<div class="xr_group">
+ <span class="xr_ar xr_scstrch" style="height: 70px; top: 567px; position: absolute; background-color: #632ACF;"></span>
+</div>
+ <div class="xr_trigo_xr_ce0" style="position:absolute;left:759px;top:5px;width:521px;height:45px;z-index:-1;"></div>
+<div class="xr_xpos" id="xr_xpxr_2" style="position:absolute; left: 759px; top: 5px; width:521px; height:45px; visibility:hidden; display:none;">
+<div id="xr_nb1" class="xr_ar">
+ <div class="xr_ar xr_nb0">
+ <a href="javascript:;" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/1.webp" alt="Home" title="" onmousemove="xr_mo(this,0,event)" style="left:0px;top:0px;width:81px;height:45px;"/>
+  <img class="xr_rn_ xr_ap xr_rs" src="index_html_files/53.webp" alt="Home" title="" onmousemove="xr_mo(this,0)" style="left:0px;top:0px;width:81px;height:45px;"/>
+ </a>
+ </div>
+ <div class="xr_ar xr_nb0">
+ <a href="text.html" target="_self" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/2.webp" alt="Text" title="" onmousemove="xr_mo(this,0,event)" style="left:80px;top:0px;width:72px;height:45px;"/>
+  <img class="xr_rn_ xr_ap xr_ro xr_ro0 xr_tt3" src="index_html_files/54.webp" alt="Text" title="" onmousemove="xr_mo(this,0)" style="left:80px;top:0px;width:72px;height:45px;"/>
+ </a>
+ </div>
+ <div class="xr_ar xr_nb0">
+ <a href="color.html" target="_self" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/3.webp" alt="Color" title="" onmousemove="xr_mo(this,0,event)" style="left:151px;top:0px;width:79px;height:45px;"/>
+  <img class="xr_rn_ xr_ap xr_ro xr_ro0 xr_tt3" src="index_html_files/55.webp" alt="Color" title="" onmousemove="xr_mo(this,0)" style="left:151px;top:0px;width:79px;height:45px;"/>
+ </a>
+ </div>
+ <div class="xr_ar xr_nb0">
+ <a href="photo.html" target="_self" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/4.webp" alt="Photo" title="" onmousemove="xr_mo(this,0,event)" style="left:229px;top:0px;width:81px;height:45px;"/>
+  <img class="xr_rn_ xr_ap xr_ro xr_ro0 xr_tt3" src="index_html_files/56.webp" alt="Photo" title="" onmousemove="xr_mo(this,0)" style="left:229px;top:0px;width:81px;height:45px;"/>
+ </a>
+ </div>
+ <div class="xr_ar xr_nb0">
+ <a href="animation.html" target="_self" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/5.webp" alt="Animation" title="" onmousemove="xr_mo(this,0,event)" style="left:309px;top:0px;width:106px;height:45px;"/>
+  <img class="xr_rn_ xr_ap xr_ro xr_ro0 xr_tt3" src="index_html_files/57.webp" alt="Animation" title="" onmousemove="xr_mo(this,0)" style="left:309px;top:0px;width:106px;height:45px;"/>
+ </a>
+ </div>
+ <div class="xr_ar xr_nb0">
+ <a href="navigation.html" target="_self" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/6.webp" alt="Navigation" title="" onmousemove="xr_mo(this,0,event)" style="left:414px;top:0px;width:107px;height:45px;"/>
+  <img class="xr_rn_ xr_ap xr_ro xr_ro0 xr_tt3" src="index_html_files/58.webp" alt="Navigation" title="" onmousemove="xr_mo(this,0)" style="left:414px;top:0px;width:107px;height:45px;"/>
+ </a>
+ </div>
+</div>
+</div>
+ <div class="xr_txt xr_s0" style="position: absolute; left:136px; top:318px; width:490px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s1" style="left: 0px; top: -51.31px;">Welcome to Xara Web </span>
+  <span class="xr_tl Heading_1 TITLE xr_s1" style="left: 0px; top: 7.52px;">Designer+</span>
+  <h3 class="xr_tl Heading_1 Heading_3 xr_s2" style="left: 0px; top: 79.48px;margin:0;">Create your own professional websites</h3>
+ </div>
+<div class="xr_group">
+ <span class="xr_ar" style="left:1149px;top:597px;width:1px;height:1px; pointer-events: none; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 1; pointer-events: none;" >  <path fill="Transparent" stroke="#FF0000" stroke-width="0.4" stroke-miterlimit="10.00"d="M 0 0.06 L 0.03 0 L 0.06 0.06 L 0 0.06 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:1077px;top:597px;width:125px;height:103px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 125 103; pointer-events: none;" >  <path fill="#C4AEEF" stroke="Transparent" stroke-width="0"d="M 52.71 103.01 L 36.36 71.05 L 0 0 L 72.77 0 L 125.47 103.01 L 52.71 103.01 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:1076px;top:494px;width:125px;height:103px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 125 103; pointer-events: none;" >  <path fill="#C4AEEF" stroke="Transparent" stroke-width="0"d="M 0.03 103.07 L 0 103.01 L 36.38 31.93 L 52.72 0 L 125.47 0 L 72.77 103.01 L 72.74 103.07 L 0.03 103.07 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_ap" src="index_html_files/7.webp" alt="" title="" style="left:1077px;top:494px;width:125px;height:103px;"/>
+ <span class="xr_ar" style="left:1076px;top:597px;width:1px;height:1px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 1; pointer-events: none;" >  <path fill="#9168DF" stroke="Transparent" stroke-width="0"d="M 0 0.06 L 0.03 0 L 0.06 0.06 L 0 0.06 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_ap" src="index_html_files/8.webp" alt="" title="" style="left:1077px;top:597px;width:125px;height:103px;"/>
+ <span class="xr_ar" style="left:1011px;top:494px;width:125px;height:103px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 125 103; pointer-events: none;" >  <path fill="#FFFFFF" stroke="Transparent" stroke-width="0"d="M 52.71 103.01 L 0 0 L 72.76 0 L 89.13 31.99 L 125.49 103.01 L 52.71 103.01 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_ap" src="index_html_files/9.webp" alt="" title="" style="left:1011px;top:494px;width:125px;height:103px;"/>
+<div class="xr_group">
+ <span class="xr_ar" style="left:1012px;top:597px;width:125px;height:103px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 125 103; pointer-events: none;" >  <path fill="#E6E7E9" stroke="Transparent" stroke-width="0"d="M 0 103.07 L 52.73 0.06 L 52.75 0 L 125.47 0 L 125.49 0.06 L 89.11 71.14 L 72.77 103.07 L 0 103.07 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:1137px;top:597px;width:1px;height:1px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 1; pointer-events: none;" >  <path fill="#E6E7E9" stroke="Transparent" stroke-width="0"d="M 0.03 0.06 L 0 0 L 0.06 0 L 0.03 0.06 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+<div class="xr_group">
+ <img class="xr_ap" src="index_html_files/10.webp" alt="" title="" style="left:1012px;top:597px;width:125px;height:103px;"/>
+ <img class="xr_ap" src="index_html_files/11.webp" alt="" title="" style="left:1137px;top:596px;width:1px;height:1px;"/>
+</div>
+</div>
+ <img class="xr_rn_ xr_ap" id="template:58object" src="index_html_files/12.webp" alt="" title="" style="left:719px;top:139px;width:454px;height:561px;"/>
+ <div class="xr_trigo_xr_ce1" style="position:absolute;left:715px;top:326px;width:157px;height:156px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_4" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/13.webp" alt="" title="" style="left:715px;top:326px;width:157px;height:156px;"/>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/14.webp" alt="" title="" style="left:899px;top:175px;width:57px;height:57px;"/>
+ <div class="xr_trigo_xr_ce2" style="position:absolute;left:343px;top:595px;width:398px;height:42px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_9" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Normal_text xr_s3" style="position: absolute; left:343px; top:595px; width:398px; height:10px;">
+  <span class="xr_tr Normal_text xr_s3" style="left: 87.2px; top: -14.96px; width: 307px;">To view the website in your browser, press </span>
+  <span class="xr_tr Normal_text xr_s3" style="left: 78.02px; top: 6.01px; width: 320px;">"Preview whole website"  in the top toolbar.  </span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce3" style="position:absolute;left:746px;top:586px;width:52px;height:37px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_25" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/15.webp" alt="" title="" style="left:746px;top:586px;width:52px;height:37px;"/>
+ </div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce4" style="position:absolute;left:133px;top:2369px;width:707px;height:113px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_30" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:133px; top:2369px; width:707px; height:10px;">
+  <h2 class="xr_tr Heading_1 Heading_2 xr_s5" style="left: 432.57px; top: -27.79px; width: 274px;margin:0;">Page &amp; Layer Gallery</h2>
+  <span class="xr_tr Normal_text xr_s6" style="left: -45.58px; top: 13.62px; width: 757px;">In the right panel you will find all your pages. You can easily move between pages, </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 94.21px; top: 40.58px; width: 613px;">reorder them by dragging and dropping, delete and add new ones.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/16.webp" alt="" title="" style="left:999px;top:2228px;width:230px;height:363px;"/>
+</div>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap xr_parallax76" src="index_html_files/17.webp" alt="" title="" style="left:136px;top:950px;width:1006px;height:493px;"/>
+ <div class="xr_txt Heading_1 TITLE xr_s7 xr_bold xr_parallax93" style="position: absolute; left:412px; top:1024px; width:456px; height:10px;">
+  <span class="xr_tc Heading_1 TITLE xr_s7 xr_bold" style="left: -22.52px; top: -42.31px; width: 501px;">New Modern Interface.</span>
+ </div>
+ <span class="xr_ar" style="left:992px;top:879px;width:135px;height:82px; overflow: visible;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=10);pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 135 82; pointer-events: none;" >  <path fill="#C4AEEF" stroke="Transparent" stroke-width="0"d="M 46.88 12 C 80.96 0 118.35 17.92 130.35 51.99 C 133.81 61.82 134.79 71.92 133.6 81.61 L 3.64 81.61 C 0 51.79 17.39 22.38 46.88 12 Z" fill-opacity="0.10" stroke-opacity="0.10"  fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+<div class="xr_group">
+ <span class="xr_ar" style="left:999px;top:856px;width:151px;height:163px; overflow: visible;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=10);pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 151 163; pointer-events: none;" >  <path fill="#6C7D8E" stroke="#FFB9CB" stroke-width="2.8" stroke-miterlimit="10.00"d="M 11.19 106.07 L 53.93 124.37 C 64.05 128.69 80.49 135.73 90.61 140.06 L 133.35 158.35 C 143.48 162.68 150.63 157.32 149.32 146.39 L 143.79 100.22 C 142.47 89.29 140.35 71.54 139.04 60.61 L 133.5 14.45 C 132.19 3.52 123.97 0 115.16 6.6 L 77.95 34.47 C 69.14 41.07 54.83 51.79 46.02 58.39 L 8.81 86.27 C 0 92.87 1.06 101.75 11.19 106.07 Z" fill-opacity="0.10" stroke-opacity="0.10"  fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_rn_ xr_ap" src="index_html_files/18.webp" alt="" title="" style="left:1002px;top:837px;width:156px;height:158px;"/>
+</div>
+ <div class="xr_trigo_xr_ce5" style="position:absolute;left:225px;top:801px;width:830px;height:142px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_65" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s4" style="position: absolute; left:225px; top:801px; width:830px; height:10px;">
+  <span class="xr_tc Heading_1 TITLE xr_s8" style="left: 356.88px; top: -47.35px; width: 116px;">Meet</span>
+  <span class="xr_tc Heading_1 TITLE xr_s9 xr_bold" style="left: 32.38px; top: 3.47px; width: 765px;">Xara Web Designer+</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce6" style="position:absolute;left:375px;top:927px;width:154px;height:50px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_85" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s10" style="position: absolute; left:375px; top:927px; width:154px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s10" style="left: 0px; top: -33.03px;">No coding.</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce7" style="position:absolute;left:539px;top:926px;width:366px;height:50px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_94" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s11" style="position: absolute; left:539px; top:926px; width:366px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s11" style="left: 0px; top: -30.81px;">Simply freedom of creation</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <span class="xr_ar xr_scstrch" style="height: 427px; top: 3781px; position: absolute; background-color: #FFFFFF;"></span>
+ <div class="xr_trigo_xr_ce8" style="position:absolute;left:63px;top:3940px;width:870px;height:164px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_103" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s12 xr_bold" style="position: absolute; left:63px; top:3940px; width:870px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s12 xr_bold" style="left: 0px; top: -73.08px;">Create a Great looking </span>
+  <span class="xr_tl Heading_1 TITLE xr_s12 xr_bold" style="left: 0px; top: 1.41px;">Website</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce9" style="position:absolute;left:733px;top:4094px;width:410px;height:70px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_118" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s13" style="position: absolute; left:733px; top:4094px; width:410px; height:10px;">
+  <span class="xr_tr Heading_1 TITLE xr_s13" style="left: 29.84px; top: -54.39px; width: 380px;">in 6 easy steps</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce10" style="position:absolute;left:29px;top:3868px;width:160px;height:68px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_127" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s14" style="position: absolute; left:29px; top:3868px; width:160px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s14" style="left: 0px; top: -53.32px;">Let’s</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <span class="xr_ar xr_scstrch" style="height: 386px; top: 3395px; position: absolute; background:url('index_html_files/19.webp') center center no-repeat; background-size: cover;"></span>
+ <div class="xr_scra xr_trigo_xr_ce11" style="position:absolute;left:34px;top:3581px;width:700px;height:123px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_136" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:34px; top:3581px; width:700px; height:10px;">
+  <h1 class="xr_tr Heading_1 xr_s15" style="left: 261.75px; top: -38.48px; width: 438px;margin:0;">Responsive Web Design</h1>
+  <span class="xr_tr Normal_text xr_s6" style="left: 15.04px; top: 18.55px; width: 689px;">With Xara Web Designer+ you can create mobile optimized websites which </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 284.84px; top: 45.51px; width: 415px;">dynamically adjust to different width devices.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap xr_parallax93" id="template:58object" src="index_html_files/20.webp" alt="" title="" style="left:786px;top:3443px;width:437px;height:290px; filter: drop-shadow(7px 6px 2px rgba(0,0,0,0.25));"/>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap xr_parallax89" src="index_html_files/21.webp" alt="" title="" style="left:1081px;top:3505px;width:159px;height:205px;"/>
+ <img class="xr_rn_ xr_ap xr_parallax89" src="index_html_files/22.webp" alt="" title="" style="left:1121px;top:3524px;width:81px;height:152px;"/>
+</div>
+</div>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/23.webp" alt="" title="" style="left:95px;top:2790px;width:372px;height:523px;"/>
+ <div class="xr_scra xr_trigo_xr_ce12" style="position:absolute;left:95px;top:2789px;width:372px;height:523px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_179" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/24.webp" alt="" title="" style="left:95px;top:2789px;width:372px;height:523px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce13" style="position:absolute;left:562px;top:2988px;width:679px;height:99px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_184" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Normal_text xr_s6" style="position: absolute; left:562px; top:2988px; width:679px; height:10px;">
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: -19.24px;">Another way  is to use the Color palette from photo tool </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 495.99px; top: -19.24px;">which can analyze a </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 7.72px;">photo, identify the most predominant colors in the image, and create a color </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 34.68px;">palette.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/25.webp" alt="" title="" style="left:34px;top:3099px;width:459px;height:246px;"/>
+ <div class="xr_scra xr_trigo_xr_ce14" style="position:absolute;left:384px;top:2888px;width:260px;height:34px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_210" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/26.webp" alt="" title="" style="left:384px;top:2888px;width:260px;height:34px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce15" style="position:absolute;left:561px;top:2720px;width:682px;height:134px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_214" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:561px; top:2720px; width:682px; height:10px;">
+  <h2 class="xr_tl Heading_1 Heading_2 xr_s5" style="left: 0px; top: -27.79px;margin:0;">Named colors and color schemes</h2>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 13.62px;">Many of the web themes offered in Elements include alternative color schemes </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 40.58px;">which can easily be applied to websites to transform the color scheme instantly.</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce16" style="position:absolute;left:1034px;top:2965px;width:24px;height:23px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_248" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/27.webp" alt="" title="" style="left:1034px;top:2965px;width:24px;height:23px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce17" style="position:absolute;left:602px;top:8785px;width:617px;height:237px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_250" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/28.webp" alt="" title="" style="left:602px;top:8785px;width:617px;height:237px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce18" style="position:absolute;left:68px;top:8653px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_254" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:68px; top:8653px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">06.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce19" style="position:absolute;left:285px;top:8611px;width:721px;height:198px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_264" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:285px; top:8611px; width:721px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Edit your Navigation Bar</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Double click on a website menu to display the Navigation Bar </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 45.51px;">properties menu. </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">The upper half of the dialog allows you to set various properties of the NavBar. The </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 99.43px;">lower half allows you to add and remove buttons and menus and to edit the labels </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 126.39px;">and links of each button and menu entry.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce20" style="position:absolute;left:788px;top:8886px;width:333px;height:308px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_331" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/29.webp" alt="" title="" style="left:788px;top:8886px;width:333px;height:308px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce21" style="position:absolute;left:490px;top:9434px;width:777px;height:186px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_335" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:490px; top:9434px; width:777px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Publish the website on your hosting.</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Menu: File </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 114.55px; top: 18.55px;"> Publish website…</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 49.31px;">Open the Publish </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 173.38px; top: 49.31px;"> tab of the Web Properties dialog where you can configure the FTP </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 76.27px;">details of a hosting company. You only need to do it once, and later the changes to your site </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 103.23px;">will be uploaded with a single click.  </span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce22" style="position:absolute;left:274px;top:9476px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_400" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:274px; top:9476px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">07.</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce23" style="position:absolute;left:387px;top:9773px;width:582px;height:298px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_410" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/30.webp" alt="" title="" style="left:387px;top:9773px;width:582px;height:298px;"/>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/31.webp" alt="" title="" style="left:71px;top:9693px;width:363px;height:186px;"/>
+ <div class="xr_scra xr_trigo_xr_ce24" style="position:absolute;left:463px;top:9714px;width:37px;height:43px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_414" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:463px;top:9714px;width:37px;height:43px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 37 43; pointer-events: none;" >  <path fill="#4C4C4C" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 35.51 9.19 L 27.97 1.65 C 27.66 1.34 27.28 1.07 26.83 0.82 C 26.37 0.57 25.9 0.37 25.4 0.23 C 24.9 0.08 24.44 0 24 0 L 2.32 0 C 1.66 0.02 1.12 0.24 0.68 0.68 C 0.24 1.12 0.01 1.67 0 2.32 L 0 41.03 C 0.01 41.69 0.24 42.24 0.68 42.67 C 1.12 43.11 1.66 43.34 2.32 43.35 L 34.84 43.35 C 35.49 43.34 36.04 43.11 36.48 42.67 C 36.92 42.24 37.14 41.69 37.16 41.03 L 37.16 13.16 C 37.16 12.72 37.08 12.26 36.93 11.76 C 36.78 11.26 36.59 10.79 36.34 10.33 C 36.09 9.88 35.82 9.5 35.51 9.19 M 24.78 3.29 C 24.99 3.37 25.18 3.45 25.36 3.55 C 25.54 3.64 25.68 3.74 25.77 3.82 L 33.34 11.39 C 33.42 11.48 33.51 11.62 33.61 11.8 C 33.71 11.98 33.79 12.17 33.87 12.38 L 24.78 12.38 L 24.78 3.29 M 34.06 40.25 L 3.1 40.25 L 3.1 3.1 L 21.68 3.1 L 21.68 13.16 C 21.69 13.82 21.92 14.36 22.36 14.8 C 22.8 15.24 23.34 15.47 24 15.48 L 34.06 15.48 L 34.06 40.25 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce25" style="position:absolute;left:510px;top:9714px;width:37px;height:43px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_416" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:510px;top:9714px;width:37px;height:43px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 37 43; pointer-events: none;" >  <path fill="#4C4C4C" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 35.52 9.19 L 27.97 1.65 C 27.66 1.34 27.28 1.07 26.83 0.82 C 26.37 0.57 25.9 0.37 25.4 0.23 C 24.9 0.08 24.44 0 24 0 L 2.32 0 C 1.66 0.02 1.12 0.24 0.68 0.68 C 0.24 1.12 0.02 1.67 0 2.32 L 0 41.03 C 0.02 41.69 0.24 42.24 0.68 42.67 C 1.12 43.11 1.66 43.34 2.32 43.35 L 34.84 43.35 C 35.5 43.34 36.04 43.11 36.48 42.67 C 36.92 42.24 37.14 41.69 37.16 41.03 L 37.16 13.16 C 37.16 12.72 37.08 12.26 36.93 11.76 C 36.79 11.26 36.59 10.79 36.34 10.33 C 36.09 9.88 35.82 9.5 35.52 9.19 M 24.78 3.29 C 24.99 3.37 25.18 3.45 25.36 3.55 C 25.54 3.64 25.68 3.74 25.77 3.82 L 33.34 11.39 C 33.42 11.48 33.51 11.62 33.61 11.8 C 33.71 11.98 33.79 12.17 33.87 12.38 L 24.78 12.38 L 24.78 3.29 M 34.06 40.25 L 3.1 40.25 L 3.1 3.1 L 21.68 3.1 L 21.68 13.16 C 21.69 13.82 21.92 14.36 22.36 14.8 C 22.8 15.24 23.34 15.47 24 15.48 L 34.06 15.48 L 34.06 40.25 M 9.29 19.35 L 9.29 20.9 C 9.3 21.12 9.37 21.31 9.51 21.45 C 9.66 21.59 9.84 21.67 10.07 21.67 L 27.1 21.67 C 27.32 21.67 27.5 21.59 27.65 21.45 C 27.79 21.31 27.87 21.12 27.87 20.9 L 27.87 19.35 C 27.87 19.13 27.79 18.95 27.65 18.8 C 27.5 18.66 27.32 18.58 27.1 18.58 L 10.07 18.58 C 9.84 18.58 9.66 18.66 9.51 18.8 C 9.37 18.95 9.3 19.13 9.29 19.35 M 27.1 24.77 L 10.07 24.77 C 9.84 24.77 9.66 24.85 9.51 24.99 C 9.37 25.14 9.3 25.32 9.29 25.54 L 9.29 27.09 C 9.3 27.32 9.37 27.5 9.51 27.64 C 9.66 27.79 9.84 27.86 10.07 27.87 L 27.1 27.87 C 27.32 27.86 27.5 27.79 27.65 27.64 C 27.79 27.5 27.87 27.32 27.87 27.09 L 27.87 25.54 C 27.87 25.32 27.79 25.14 27.65 24.99 C 27.5 24.85 27.32 24.77 27.1 24.77 M 27.1 30.97 L 10.07 30.97 C 9.84 30.98 9.66 31.05 9.51 31.2 C 9.37 31.34 9.3 31.52 9.29 31.75 L 9.29 33.29 C 9.3 33.52 9.37 33.7 9.51 33.85 C 9.66 33.99 9.84 34.07 10.07 34.07 L 27.1 34.07 C 27.32 34.07 27.5 33.99 27.65 33.85 C 27.79 33.7 27.87 33.52 27.87 33.29 L 27.87 31.75 C 27.87 31.52 27.79 31.34 27.65 31.2 C 27.5 31.05 27.32 30.98 27.1 30.97 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/32.webp" alt="" title="" style="left:639px;top:9480px;width:24px;height:23px;"/>
+</div>
+<div class="xr_group">
+ <span class="xr_ar" style="left:587px;top:9464px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+ <div class="xr_trigs xr_trigo_xr_ce26" style="position:absolute;left:1281px;top:10272px;width:0px;height:0px;visibility:hidden;z-index:-1;"></div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce27" style="position:absolute;left:83px;top:6145px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_423" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:83px; top:6145px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">03.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce28" style="position:absolute;left:292px;top:6097px;width:606px;height:139px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_433" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:292px; top:6097px; width:606px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Edit the text on your website</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Use Text Tool from left tool bar.</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 45.51px;">Click the big T icon on the left set of tools (the Text Tool). Now click on </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">any text and start editing.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/34.webp" alt="" title="" style="left:196px;top:6250px;width:888px;height:462px;"/>
+</div>
+<div class="xr_group">
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/35.webp" alt="" title="" style="left:200px;top:7988px;width:52px;height:203px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/36.webp" alt="" title="" style="left:205px;top:8039px;width:328px;height:43px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/37.webp" alt="" title="" style="left:156px;top:8128px;width:145px;height:90px;"/>
+ <div class="xr_txt Quote_text xr_s18 xr_italic" style="position: absolute; left:508px; top:8129px; width:56px; height:10px;">
+  <span class="xr_tc Quote_text xr_s18 xr_italic" style="left: -31.29px; top: -11.26px; width: 63px;">Palette from</span>
+  <span class="xr_tc Quote_text xr_s18 xr_italic" style="left: -15px; top: 3.08px; width: 30px;">Photo</span>
+ </div>
+<div class="xr_group">
+ <span class="xr_ar" style="left:508px;top:8096px;width:1px;height:17px; pointer-events: none; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 17; pointer-events: none;" >  <path fill="none" stroke="#177367" stroke-width="1.1" stroke-linecap="round" stroke-miterlimit="10.00"d="M 0 17.01 C 0 7.59 0 1.92 0 0 " fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:505px;top:8090px;width:6px;height:6px; pointer-events: none; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 6 6; pointer-events: none;" >  <path fill="#177367" stroke="Transparent" stroke-width="0" stroke-linecap="round"d="M 3.2 6.41 C 1.44 6.41 0 4.97 0 3.2 C 0 1.44 1.44 0 3.2 0 C 4.97 0 6.41 1.44 6.41 3.2 C 6.41 4.97 4.97 6.41 3.2 6.41 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+</div>
+ <div class="xr_scra xr_trigo_xr_ce29" style="position:absolute;left:483px;top:7779px;width:608px;height:174px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_498" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:483px; top:7779px; width:608px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Change the colors with one click.</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Change Color Styles or Use Palette from photo</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 45.51px;">Change the color style globally by selecting a new theme or select the </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">photo you want to use to set the document colors, then click the icon on </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 99.43px;">the Photo Tool fly-out bar </span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce30" style="position:absolute;left:274px;top:7821px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_553" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:274px; top:7821px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">05.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/38.webp" alt="" title="" style="left:666px;top:7963px;width:267px;height:408px;"/>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce31" style="position:absolute;left:408px;top:5705px;width:181px;height:31px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_563" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s19 xr_bold" style="position: absolute; left:408px; top:5705px; width:181px; height:10px;">
+  <span class="xr_tc xr_s19 xr_bold" style="left: 127.86px; top: -33.15px; width: 202px;"><span id="start"></span>Coffee Shop</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce32" style="position:absolute;left:406px;top:5431px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_577" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:406px; top:5431px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">02.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce33" style="position:absolute;left:615px;top:5382px;width:623px;height:142px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_587" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:615px; top:5382px; width:623px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Drag-n-drop sections</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Designs Gallery: Modular Websites </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 331.2px; top: 18.55px;"> Web Blocks</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 45.51px;">Select pre-designed sections and drag them where you need them in the </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">page. They are fully customizable and multi-purpose for a consistent look.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/39.webp" alt="" title="" style="left:9px;top:5361px;width:368px;height:497px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/40.webp" alt="" title="" style="left:410px;top:5516px;width:828px;height:342px;"/>
+ <div class="xr_scra xr_trigo_xr_ce34" style="position:absolute;left:820px;top:5712px;width:117px;height:67px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_657" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/41.webp" alt="" title="" style="left:820px;top:5712px;width:117px;height:67px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce35" style="position:absolute;left:929px;top:5412px;width:17px;height:8px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_661" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:929px;top:5412px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce36" style="position:absolute;left:30px;top:4395px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_663" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:30px; top:4395px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">01.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce37" style="position:absolute;left:457px;top:4755px;width:756px;height:376px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_673" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/42.webp" alt="" title="" style="left:457px;top:4755px;width:756px;height:376px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce38" style="position:absolute;left:245px;top:4347px;width:808px;height:200px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_677" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:245px; top:4347px; width:808px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Choose a Modular Website Template</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Designs Gallery: Websites </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 250.64px; top: 18.55px;"> Modular Websites</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 45.51px;">The Designs Gallery is where you’ll find all our newest website templates, as well as website </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">blocks, components and royalty free stock photos and illustrations. Additionally, you can visit </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 99.43px;">Elements to download an extensive library of resources and designs - Menu: New From </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 126.39px;">Elements </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 99.46px; top: 126.39px;"> Websites </span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/43.webp" alt="" title="" style="left:12px;top:4579px;width:377px;height:563px;"/>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce39" style="position:absolute;left:380px;top:4671px;width:127px;height:183px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_762" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/44.webp" alt="" title="" style="left:380px;top:4671px;width:127px;height:183px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce40" style="position:absolute;left:495px;top:4836px;width:52px;height:44px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_764" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/45.webp" alt="" title="" style="left:495px;top:4836px;width:52px;height:44px;"/>
+ </div>
+</div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce41" style="position:absolute;left:327px;top:4485px;width:17px;height:8px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_766" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:327px;top:4485px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce42" style="position:absolute;left:478px;top:4377px;width:17px;height:8px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_768" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:478px;top:4377px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/46.webp" alt="" title="" style="left:26px;top:20px;width:189px;height:80px;"/>
+<div class="xr_group">
+ <img class="xr_ap" src="index_html_files/47.webp" alt="" title="" style="left:1043px;top:7121px;width:275px;height:317px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/48.webp" alt="" title="" style="left:80px;top:7225px;width:571px;height:315px;"/>
+ <div class="xr_scra xr_trigo_xr_ce43" style="position:absolute;left:184px;top:6993px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_770" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:184px; top:6993px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">04.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce44" style="position:absolute;left:393px;top:6950px;width:732px;height:155px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_780" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:393px; top:6950px; width:732px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Change and add new photos</h1>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 18.55px;">To add a photo to any page, simply drag and drop a photo file from the Windows File </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 45.51px;">Explorer. If you drop the photo on the page or on top of some text, it is added as a new </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">photo </span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce45" style="position:absolute;left:166px;top:7246px;width:228px;height:163px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_832" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/49.webp" alt="" title="" style="left:166px;top:7246px;width:228px;height:163px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce46" style="position:absolute;left:339px;top:7201px;width:202px;height:128px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_836" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/50.webp" alt="" title="" style="left:339px;top:7201px;width:202px;height:128px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <span class="xr_ar xr_parallax99" style="left:-2px;top:1493px;width:1281px;height:635px; background-color: #FFFFFF;"></span>
+ <div class="xr_scra xr_trigo_xr_ce47" style="position:absolute;left:530px;top:1864px;width:615px;height:135px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_840" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:530px; top:1864px; width:615px; height:10px;">
+  <h2 class="xr_tr Heading_1 Heading_2 xr_s5" style="left: 440.43px; top: -27.79px; width: 175px;margin:0;">Main Toolbar</h2>
+  <span class="xr_tr Normal_text xr_s6" style="left: -51.54px; top: 13.62px; width: 671px;">One of the unique benefits of Xara Web Designer+ Tools is that you have </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -37.04px; top: 40.58px; width: 657px;">complete freedom to place any object anywhere on the page, and your </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 277.89px; top: 67.54px; width: 337px;">website will faithfully reproduce this.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce48" style="position:absolute;left:31px;top:1631px;width:285px;height:57px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_883" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 xr_s15" style="position: absolute; left:31px; top:1631px; width:285px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Creative Tools</h1>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/51.webp" alt="" title="" style="left:36px;top:1622px;width:626px;height:386px;"/>
+</div>
+<div class="xr_group">
+<div class="xr_group">
+ <span class="xr_ar xr_scstrch" style="height: 58px; top: 10272px; position: absolute; background-color: #632ACF;"></span>
+ <div class="xr_trigo_xr_ce49" style="position:absolute;left:0px;top:10272px;width:1280px;height:58px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_892" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Normal_text xr_s20" style="position: absolute; left:227px; top:10306px; width:1040px; height:10px;">
+  <span class="xr_tr Normal_text xr_s20" style="left: 417.04px; top: -14.96px; width: 623px;"><span id="LayoutControl:58stretch"></span>Website made using only Xara Web Designer+, and no other graphics or software tools.</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce50" style="position:absolute;left:0px;top:10272px;width:1280px;height:58px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_908" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" id="type:58invertedlogo" src="index_html_files/52.webp" alt="" title="" style="left:13px;top:10277px;width:140px;height:48px;"/>
+ </div>
+</div>
+</div>
+ <div id="xr_xd0"></div>
+</div>
+</div>
+<div id="xr_mvp_2" class="xr_mvp_2 xr_bgn_1_0_0 xr_mvpo" style="position:absolute; width:480px; height:10339px;">
+<div class="xr_ap xr_xri_" style="width: 480px; height: 10339px;">
+<div class="xr_group">
+<div class="xr_group">
+<div id="Xxr_v2_rectangle" style="position:absolute; left:0px; top:0px"></div>
+ <span class="xr_ar xr_scstrch" style="height: 400px; top: 0px; position: absolute; background-color: #311567;"></span>
+</div>
+ <img class="xr_rn_ xr_ap" id="Xxr_v2_template:58object" src="index_html_files/46.webp" alt="" title="" style="left:10px;top:20px;width:189px;height:80px;"/>
+<div class="xr_group">
+ <span class="xr_ar" style="left:450px;top:348px;width:1px;height:1px; pointer-events: none; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 1; pointer-events: none;" >  <path fill="Transparent" stroke="#FF0000" stroke-width="0.2" stroke-miterlimit="10.00"d="M 0 0.03 L 0.02 0 L 0.03 0.03 L 0 0.03 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:410px;top:348px;width:70px;height:52px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 70 52; pointer-events: none;" >  <path fill="#C4AEEF" stroke="Transparent" stroke-width="0"d="M 29.56 51.66 L 20.39 35.63 L 0 0 L 40.8 0 L 70.35 51.66 L 29.56 51.66 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:410px;top:297px;width:70px;height:52px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 70 52; pointer-events: none;" >  <path fill="#C4AEEF" stroke="Transparent" stroke-width="0"d="M 0.02 51.69 L 0 51.66 L 20.4 16.01 L 29.56 0 L 70.35 0 L 40.8 51.66 L 40.79 51.69 L 0.02 51.69 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_ap" src="index_html_files/59.webp" alt="" title="" style="left:410px;top:296px;width:70px;height:52px;"/>
+ <span class="xr_ar" style="left:410px;top:348px;width:1px;height:1px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 1; pointer-events: none;" >  <path fill="#9168DF" stroke="Transparent" stroke-width="0"d="M 0 0.03 L 0.02 0 L 0.03 0.03 L 0 0.03 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_ap" src="index_html_files/60.webp" alt="" title="" style="left:410px;top:348px;width:70px;height:52px;"/>
+ <span class="xr_ar" style="left:373px;top:297px;width:70px;height:52px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 70 52; pointer-events: none;" >  <path fill="#FFFFFF" stroke="Transparent" stroke-width="0"d="M 29.56 51.66 L 0 0 L 40.8 0 L 49.98 16.05 L 70.36 51.66 L 29.56 51.66 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_ap" src="index_html_files/61.webp" alt="" title="" style="left:373px;top:296px;width:70px;height:52px;"/>
+<div class="xr_group">
+ <span class="xr_ar" style="left:373px;top:348px;width:70px;height:52px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 70 52; pointer-events: none;" >  <path fill="#E6E7E9" stroke="Transparent" stroke-width="0"d="M 0 51.69 L 29.56 0.03 L 29.58 0 L 70.35 0 L 70.37 0.03 L 49.96 35.67 L 40.8 51.69 L 0 51.69 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:444px;top:348px;width:1px;height:1px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 1; pointer-events: none;" >  <path fill="#E6E7E9" stroke="Transparent" stroke-width="0"d="M 0.02 0.03 L 0 0 L 0.03 0 L 0.02 0.03 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+<div class="xr_group">
+ <img class="xr_ap" src="index_html_files/62.webp" alt="" title="" style="left:373px;top:348px;width:70px;height:52px;"/>
+ <img class="xr_ap" src="index_html_files/11.webp" alt="" title="" style="left:444px;top:347px;width:1px;height:1px;"/>
+</div>
+</div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/63.webp" alt="" title="" style="left:197px;top:306px;width:85px;height:85px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/64.webp" alt="" title="" style="left:394px;top:73px;width:57px;height:57px;"/>
+</div>
+<div class="xr_group">
+ <div class="xr_txt Quote_text xr_s21" style="position: absolute; left:70px; top:429px; width:316px; height:10px;">
+  <span class="xr_tl Quote_text xr_s21" style="left: 0px; top: -14.96px;">Press "Preview whole website" in the top toolbar.</span>
+ </div>
+<div class="xr_group">
+<div class="xr_group">
+ <span class="xr_ar" style="left:11px;top:373px;width:55px;height:55px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 55 55; pointer-events: none;" >  <path fill="#FFFFFF" stroke="#632ACF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"d="M 0 27.41 C 0 42.49 12.24 54.73 27.33 54.73 C 42.41 54.73 54.65 42.49 54.65 27.41 L 54.65 27.33 C 54.65 12.24 42.41 0 27.33 0 C 12.24 0 0 12.24 0 27.33 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/65.webp" alt="" title="" style="left:25px;top:391px;width:27px;height:24px;"/>
+</div>
+</div>
+ <div class="xr_txt xr_s0" style="position: absolute; left:11px; top:180px; width:457px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s1" style="left: 0px; top: -51.31px;">Welcome to Xara </span>
+  <span class="xr_tl Heading_1 TITLE xr_s1" style="left: 0px; top: 7.52px;">Web Designer+</span>
+  <h3 class="xr_tl Heading_1 Heading_3 xr_s2" style="left: 0px; top: 79.48px;margin:0;">Create your own professional websites</h3>
+ </div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce51" style="position:absolute;left:15px;top:1649px;width:248px;height:265px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_914" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:15px; top:1649px; width:248px; height:10px;">
+  <h2 class="xr_tr Heading_1 Heading_2 xr_s5" style="left: 73.93px; top: -27.79px; width: 181px;margin:0;">Page &amp; Layer </h2>
+  <h2 class="xr_tr Heading_1 Heading_2 xr_s5" style="left: 154.74px; top: 7.62px; width: 93px;margin:0;">Gallery</h2>
+  <span class="xr_tr Normal_text xr_s6" style="left: 14.94px; top: 49.02px; width: 238px;">In the right panel you will </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -3.95px; top: 75.98px; width: 257px;">find all your pages. You can </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -9.8px; top: 102.95px; width: 263px;">easily move between pages, </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 11.48px; top: 129.91px; width: 241px;">reorder them by dragging </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -25.22px; top: 156.87px; width: 278px;">and dropping, delete and add </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 154.72px; top: 183.83px; width: 93px;">new ones.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/66.webp" alt="" title="" style="left:262px;top:1623px;width:231px;height:363px;"/>
+</div>
+<div class="xr_group">
+ <div class="xr_trigo_xr_ce52" style="position:absolute;left:68px;top:709px;width:344px;height:46px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_996" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s22 xr_bold" style="position: absolute; left:68px; top:709px; width:344px; height:10px;">
+  <span class="xr_tc Heading_1 TITLE xr_s22 xr_bold" style="left: -15.94px; top: -31.71px; width: 375px;">New Modern Interface.</span>
+ </div>
+ </div>
+ <span class="xr_ar" style="left:366px;top:518px;width:71px;height:43px; overflow: visible;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=10);pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 71 43; pointer-events: none;" >  <path fill="#C4AEEF" stroke="Transparent" stroke-width="0"d="M 24.77 6.34 C 42.77 0 62.53 9.47 68.87 27.47 C 70.7 32.66 71.21 38 70.59 43.12 L 1.92 43.12 C 0 27.36 9.19 11.83 24.77 6.34 Z" fill-opacity="0.10" stroke-opacity="0.10"  fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+<div class="xr_group">
+ <span class="xr_ar" style="left:370px;top:505px;width:80px;height:86px; overflow: visible;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=10);pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 80 86; pointer-events: none;" >  <path fill="#6C7D8E" stroke="#FFB9CB" stroke-width="2.8" stroke-miterlimit="10.00"d="M 5.91 56.05 L 28.49 65.71 C 33.84 68 42.53 71.71 47.87 74 L 70.46 83.67 C 75.81 85.95 79.59 83.12 78.89 77.35 L 75.97 52.95 C 75.28 47.18 74.15 37.8 73.46 32.02 L 70.54 7.63 C 69.84 1.86 65.5 0 60.85 3.49 L 41.19 18.21 C 36.53 21.7 28.97 27.37 24.31 30.85 L 4.66 45.58 C 0 49.07 0.56 53.76 5.91 56.05 Z" fill-opacity="0.10" stroke-opacity="0.10"  fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <img class="xr_rn_ xr_ap" src="index_html_files/67.webp" alt="" title="" style="left:370px;top:495px;width:84px;height:85px;"/>
+</div>
+ <div class="xr_trigo_xr_ce53" style="position:absolute;left:0px;top:738px;width:480px;height:235px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_1006" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/68.webp" alt="" title="" style="left:0px;top:738px;width:480px;height:235px;"/>
+ </div>
+ <div class="xr_trigo_xr_ce54" style="position:absolute;left:12px;top:521px;width:456px;height:142px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_1011" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s4" style="position: absolute; left:12px; top:521px; width:456px; height:10px;">
+  <span class="xr_tc Heading_1 TITLE xr_s23" style="left: 190.2px; top: -30.87px; width: 76px;">Meet</span>
+  <span class="xr_tc Heading_1 TITLE xr_s24 xr_bold" style="left: -21.33px; top: 5.05px; width: 499px;">Xara Web Designer+</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce55" style="position:absolute;left:37px;top:619px;width:121px;height:39px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_1031" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s25" style="position: absolute; left:37px; top:619px; width:121px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s25" style="left: 0px; top: -25.75px;">No coding.</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce56" style="position:absolute;left:165px;top:618px;width:287px;height:39px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_1040" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s26" style="position: absolute; left:165px; top:618px; width:287px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s26" style="left: 0px; top: -24.26px;">Simply freedom of creation</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce57" style="position:absolute;left:10px;top:1113px;width:285px;height:57px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1049" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 xr_s15" style="position: absolute; left:10px; top:1113px; width:285px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Creative Tools</h1>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/69.webp" alt="" title="" style="left:15px;top:1102px;width:478px;height:294px;"/>
+ <div class="xr_scra xr_trigo_xr_ce58" style="position:absolute;left:15px;top:1382px;width:453px;height:166px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1058" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:15px; top:1382px; width:453px; height:10px;">
+  <h2 class="xr_tr Heading_1 Heading_2 xr_s5" style="left: 278.31px; top: -27.79px; width: 175px;margin:0;">Main Toolbar</h2>
+  <span class="xr_tr Normal_text xr_s6" style="left: -10.11px; top: 13.62px; width: 468px;">One of the unique benefits of Xara Web Designer+ </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -37.67px; top: 40.58px; width: 495px;">Tools is that you have complete freedom to place any </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -19.29px; top: 67.54px; width: 477px;">object anywhere on the page, and your website will </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 227.69px; top: 94.5px; width: 225px;">faithfully reproduce this.</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_trigo_xr_ce59" style="position:absolute;left:46px;top:3674px;width:421px;height:164px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_1110" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s27 xr_bold" style="position: absolute; left:46px; top:3674px; width:421px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s27 xr_bold" style="left: 0px; top: -56.42px;">Create a Great </span>
+  <span class="xr_tl Heading_1 TITLE xr_s27 xr_bold" style="left: 0px; top: 1.09px;">looking Website</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce60" style="position:absolute;left:56px;top:3823px;width:410px;height:70px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1125" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s13" style="position: absolute; left:56px; top:3823px; width:410px; height:10px;">
+  <span class="xr_tr Heading_1 TITLE xr_s13" style="left: 29.84px; top: -54.39px; width: 380px;">in 6 easy steps</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce61" style="position:absolute;left:12px;top:3603px;width:160px;height:68px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1134" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s14" style="position: absolute; left:12px; top:3603px; width:160px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s14" style="left: 0px; top: -53.32px;">Let’s</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <span class="xr_ar xr_scstrch" style="height: 597px; top: 2902px; position: absolute; background:url('index_html_files/70.webp') center center no-repeat; background-size: cover;"></span>
+ <div class="xr_scra xr_trigo_xr_ce62" style="position:absolute;left:12px;top:3287px;width:437px;height:150px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1143" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:12px; top:3287px; width:437px; height:10px;">
+  <h1 class="xr_tr Heading_1 xr_s15" style="left: -0.59px; top: -38.48px; width: 438px;margin:0;">Responsive Web Design</h1>
+  <span class="xr_tr Normal_text xr_s6" style="left: -5.06px; top: 18.55px; width: 447px;">With Xara Web Designer+ you can create mobile </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: -0.45px; top: 45.51px; width: 442px;">optimized websites which dynamically adjust to </span>
+  <span class="xr_tr Normal_text xr_s6" style="left: 222.76px; top: 72.47px; width: 215px;">different width devices.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap xr_parallax93" id="Xxr_v2_template:58object" src="index_html_files/20.webp" alt="" title="" style="left:12px;top:2882px;width:437px;height:290px; filter: drop-shadow(7px 6px 2px rgba(0,0,0,0.25));"/>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap xr_parallax89" src="index_html_files/21.webp" alt="" title="" style="left:307px;top:2944px;width:159px;height:205px;"/>
+ <img class="xr_rn_ xr_ap xr_parallax89" src="index_html_files/22.webp" alt="" title="" style="left:346px;top:2963px;width:81px;height:152px;"/>
+</div>
+</div>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/71.webp" alt="" title="" style="left:-1px;top:2036px;width:309px;height:434px;"/>
+ <div class="xr_scra xr_trigo_xr_ce63" style="position:absolute;left:-1px;top:2036px;width:309px;height:434px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1195" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/72.webp" alt="" title="" style="left:-1px;top:2036px;width:309px;height:434px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce64" style="position:absolute;left:7px;top:2724px;width:460px;height:124px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1200" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Normal_text xr_s6" style="position: absolute; left:7px; top:2724px; width:460px; height:10px;">
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: -19.24px;">Another way  is to use the Color palette from photo </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 11.52px;">tool </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 61.33px; top: 11.52px;">which can analyze a photo, identify the most </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 38.49px;">predominant colors in the image, and create a color </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 65.45px;">palette.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/73.webp" alt="" title="" style="left:-51px;top:2293px;width:381px;height:205px;"/>
+ <div class="xr_scra xr_trigo_xr_ce65" style="position:absolute;left:240px;top:2118px;width:215px;height:28px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1232" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/74.webp" alt="" title="" style="left:240px;top:2118px;width:215px;height:28px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce66" style="position:absolute;left:127px;top:2488px;width:341px;height:229px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1236" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:127px; top:2488px; width:341px; height:10px;">
+  <h2 class="xr_tl Heading_1 Heading_2 xr_s5" style="left: 0px; top: -27.79px;margin:0;">Named colors and color </h2>
+  <h2 class="xr_tl Heading_1 Heading_2 xr_s5" style="left: 0px; top: 7.62px;margin:0;">schemes</h2>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 49.02px;">Many of the web themes offered in </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 75.98px;">Elements include alternative color </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 102.95px;">schemes which can easily be applied to </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 129.91px;">websites to transform the color scheme </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 156.87px;">instantly.</span>
+ </div>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce67" style="position:absolute;left:45px;top:2732px;width:24px;height:23px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1309" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/27.webp" alt="" title="" style="left:45px;top:2732px;width:24px;height:23px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce68" style="position:absolute;left:10px;top:8427px;width:460px;height:177px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1311" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/75.webp" alt="" title="" style="left:10px;top:8427px;width:460px;height:177px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce69" style="position:absolute;left:7px;top:8093px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1315" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:7px; top:8093px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">06.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce70" style="position:absolute;left:10px;top:8181px;width:458px;height:269px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1325" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:10px; top:8181px; width:458px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Edit your Navigation Bar</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Double click on a website menu to display the </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 45.51px;">Navigation Bar </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 72.47px;">properties menu. </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 99.43px;">The upper half of the dialog allows you to set various </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 126.39px;">properties of the NavBar. The lower half allows you to </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 153.35px;">add and remove buttons and menus and to edit the </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 180.31px;">labels and links of each button and menu entry.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce71" style="position:absolute;left:149px;top:8502px;width:249px;height:230px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1412" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/76.webp" alt="" title="" style="left:149px;top:8502px;width:249px;height:230px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce72" style="position:absolute;left:10px;top:8938px;width:458px;height:287px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1416" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:10px; top:8938px; width:458px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Publish the website on </h1>
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: 10.55px;margin:0;">your hosting.</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 67.57px;">Menu: File </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 114.55px; top: 67.57px;"> Publish website…</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 98.33px;">Open the Publish </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 173.38px; top: 98.33px;"> tab of the Web Properties dialog </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 125.29px;">where you can configure the FTP details of a hosting </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 152.25px;">company. You only need to do it once, and later the </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 179.22px;">changes to your site will be uploaded with a single </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 206.18px;">click.  </span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce73" style="position:absolute;left:7px;top:8853px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1511" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:7px; top:8853px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">07.</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce74" style="position:absolute;left:90px;top:9593px;width:298px;height:604px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_1521" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/77.webp" alt="" title="" style="left:90px;top:9593px;width:298px;height:604px;"/>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/78.webp" alt="" title="" style="left:10px;top:9229px;width:458px;height:235px;"/>
+ <div class="xr_scra xr_trigo_xr_ce75" style="position:absolute;left:198px;top:9516px;width:37px;height:43px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1525" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:198px;top:9516px;width:37px;height:43px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 37 43; pointer-events: none;" >  <path fill="#4C4C4C" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 35.51 9.19 L 27.97 1.65 C 27.66 1.34 27.28 1.07 26.83 0.82 C 26.37 0.57 25.9 0.37 25.4 0.23 C 24.9 0.08 24.44 0 24 0 L 2.32 0 C 1.66 0.02 1.12 0.24 0.68 0.68 C 0.24 1.12 0.01 1.67 0 2.32 L 0 41.03 C 0.01 41.69 0.24 42.24 0.68 42.67 C 1.12 43.11 1.66 43.34 2.32 43.35 L 34.84 43.35 C 35.49 43.34 36.04 43.11 36.48 42.67 C 36.92 42.24 37.14 41.69 37.16 41.03 L 37.16 13.16 C 37.16 12.72 37.08 12.26 36.93 11.76 C 36.78 11.26 36.59 10.79 36.34 10.33 C 36.09 9.88 35.82 9.5 35.51 9.19 M 24.78 3.29 C 24.99 3.37 25.18 3.45 25.36 3.55 C 25.54 3.64 25.68 3.74 25.77 3.82 L 33.34 11.39 C 33.42 11.48 33.51 11.62 33.61 11.8 C 33.71 11.98 33.79 12.17 33.87 12.38 L 24.78 12.38 L 24.78 3.29 M 34.06 40.25 L 3.1 40.25 L 3.1 3.1 L 21.68 3.1 L 21.68 13.16 C 21.69 13.82 21.92 14.36 22.36 14.8 C 22.8 15.24 23.34 15.47 24 15.48 L 34.06 15.48 L 34.06 40.25 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce76" style="position:absolute;left:245px;top:9516px;width:37px;height:43px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1528" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:245px;top:9516px;width:37px;height:43px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 37 43; pointer-events: none;" >  <path fill="#4C4C4C" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 35.52 9.19 L 27.97 1.65 C 27.66 1.34 27.28 1.07 26.83 0.82 C 26.37 0.57 25.9 0.37 25.4 0.23 C 24.9 0.08 24.44 0 24 0 L 2.32 0 C 1.66 0.02 1.12 0.24 0.68 0.68 C 0.24 1.12 0.02 1.67 0 2.32 L 0 41.03 C 0.02 41.69 0.24 42.24 0.68 42.67 C 1.12 43.11 1.66 43.34 2.32 43.35 L 34.84 43.35 C 35.5 43.34 36.04 43.11 36.48 42.67 C 36.92 42.24 37.14 41.69 37.16 41.03 L 37.16 13.16 C 37.16 12.72 37.08 12.26 36.93 11.76 C 36.79 11.26 36.59 10.79 36.34 10.33 C 36.09 9.88 35.82 9.5 35.52 9.19 M 24.78 3.29 C 24.99 3.37 25.18 3.45 25.36 3.55 C 25.54 3.64 25.68 3.74 25.77 3.82 L 33.34 11.39 C 33.42 11.48 33.51 11.62 33.61 11.8 C 33.71 11.98 33.79 12.17 33.87 12.38 L 24.78 12.38 L 24.78 3.29 M 34.06 40.25 L 3.1 40.25 L 3.1 3.1 L 21.68 3.1 L 21.68 13.16 C 21.69 13.82 21.92 14.36 22.36 14.8 C 22.8 15.24 23.34 15.47 24 15.48 L 34.06 15.48 L 34.06 40.25 M 9.29 19.35 L 9.29 20.9 C 9.3 21.12 9.37 21.31 9.51 21.45 C 9.66 21.59 9.84 21.67 10.07 21.67 L 27.1 21.67 C 27.32 21.67 27.5 21.59 27.65 21.45 C 27.79 21.31 27.87 21.12 27.87 20.9 L 27.87 19.35 C 27.87 19.13 27.79 18.95 27.65 18.8 C 27.5 18.66 27.32 18.58 27.1 18.58 L 10.07 18.58 C 9.84 18.58 9.66 18.66 9.51 18.8 C 9.37 18.95 9.3 19.13 9.29 19.35 M 27.1 24.77 L 10.07 24.77 C 9.84 24.77 9.66 24.85 9.51 24.99 C 9.37 25.14 9.3 25.32 9.29 25.54 L 9.29 27.09 C 9.3 27.32 9.37 27.5 9.51 27.64 C 9.66 27.79 9.84 27.86 10.07 27.87 L 27.1 27.87 C 27.32 27.86 27.5 27.79 27.65 27.64 C 27.79 27.5 27.87 27.32 27.87 27.09 L 27.87 25.54 C 27.87 25.32 27.79 25.14 27.65 24.99 C 27.5 24.85 27.32 24.77 27.1 24.77 M 27.1 30.97 L 10.07 30.97 C 9.84 30.98 9.66 31.05 9.51 31.2 C 9.37 31.34 9.3 31.52 9.29 31.75 L 9.29 33.29 C 9.3 33.52 9.37 33.7 9.51 33.85 C 9.66 33.99 9.84 34.07 10.07 34.07 L 27.1 34.07 C 27.32 34.07 27.5 33.99 27.65 33.85 C 27.79 33.7 27.87 33.52 27.87 33.29 L 27.87 31.75 C 27.87 31.52 27.79 31.34 27.65 31.2 C 27.5 31.05 27.32 30.98 27.1 30.97 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/32.webp" alt="" title="" style="left:159px;top:9032px;width:24px;height:23px;"/>
+</div>
+<div class="xr_group">
+ <span class="xr_ar" style="left:107px;top:9017px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce77" style="position:absolute;left:9px;top:5799px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1531" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:9px; top:5799px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">03.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce78" style="position:absolute;left:12px;top:5871px;width:454px;height:201px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1541" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:12px; top:5871px; width:454px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Edit the text on your </h1>
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: 10.55px;margin:0;">website</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 67.57px;">Use Text Tool from left tool bar.</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 94.53px;">Click the big T icon on the left set of tools (the Text </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 121.49px;">Tool). Now click on any text and start editing.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/79.webp" alt="" title="" style="left:12px;top:6087px;width:454px;height:268px;"/>
+</div>
+<div class="xr_group">
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/35.webp" alt="" title="" style="left:11px;top:7743px;width:52px;height:203px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/36.webp" alt="" title="" style="left:16px;top:7794px;width:328px;height:43px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/80.webp" alt="" title="" style="left:-32px;top:7883px;width:145px;height:90px;"/>
+ <div class="xr_txt Quote_text xr_s18 xr_italic" style="position: absolute; left:319px; top:7884px; width:56px; height:10px;">
+  <span class="xr_tc Quote_text xr_s18 xr_italic" style="left: -31.29px; top: -11.26px; width: 63px;">Palette from</span>
+  <span class="xr_tc Quote_text xr_s18 xr_italic" style="left: -15px; top: 3.08px; width: 30px;">Photo</span>
+ </div>
+<div class="xr_group">
+ <span class="xr_ar" style="left:319px;top:7851px;width:1px;height:17px; pointer-events: none; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 1 17; pointer-events: none;" >  <path fill="none" stroke="#177367" stroke-width="1.1" stroke-linecap="round" stroke-miterlimit="10.00"d="M 0 17.01 C 0 7.59 0 1.92 0 0 " fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ <span class="xr_ar" style="left:316px;top:7845px;width:6px;height:6px; pointer-events: none; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 6 6; pointer-events: none;" >  <path fill="#177367" stroke="Transparent" stroke-width="0" stroke-linecap="round"d="M 3.2 6.41 C 1.44 6.41 0 4.97 0 3.2 C 0 1.44 1.44 0 3.2 0 C 4.97 0 6.41 1.44 6.41 3.2 C 6.41 4.97 4.97 6.41 3.2 6.41 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+</div>
+</div>
+ <div class="xr_scra xr_trigo_xr_ce79" style="position:absolute;left:12px;top:7377px;width:456px;height:256px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1619" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:12px; top:7377px; width:456px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Change the colors with </h1>
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: 10.55px;margin:0;">one click.</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 67.57px;">Change Color Styles or Use Palette from photo</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 94.53px;">Change the color style globally by selecting a new </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 121.49px;">theme or select the photo you want to use to set the </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 148.45px;">document colors, then click the icon on the Photo Tool </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 175.41px;">fly-out bar </span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce80" style="position:absolute;left:9px;top:7295px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1695" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:9px; top:7295px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">05.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/81.webp" alt="" title="" style="left:310px;top:7595px;width:158px;height:155px;"/>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce81" style="position:absolute;left:10px;top:5660px;width:181px;height:31px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1705" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s19 xr_bold" style="position: absolute; left:10px; top:5660px; width:181px; height:10px;">
+  <span class="xr_tc xr_s19 xr_bold" style="left: 127.86px; top: -33.15px; width: 202px;"><span id="Xxr_v2_start"></span>Coffee Shop</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce82" style="position:absolute;left:9px;top:5116px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1719" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:9px; top:5116px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">02.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce83" style="position:absolute;left:12px;top:5195px;width:454px;height:205px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1729" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:12px; top:5195px; width:454px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Drag-n-drop sections</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 18.55px;">Designs Gallery: Modular Websites </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 331.2px; top: 18.55px;"> Web Blocks</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 45.51px;">Select pre-designed sections and drag them where </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 72.47px;">you need them in the page. They are fully </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 99.43px;">customizable and multi-purpose for a consistent look.</span>
+ </div>
+ </div>
+ <img class="xr_rn_ xr_ap" src="index_html_files/82.webp" alt="" title="" style="left:12px;top:5418px;width:458px;height:260px;"/>
+ <div class="xr_scra xr_trigo_xr_ce84" style="position:absolute;left:149px;top:5543px;width:117px;height:67px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1809" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/41.webp" alt="" title="" style="left:149px;top:5543px;width:117px;height:67px;"/>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce85" style="position:absolute;left:326px;top:5225px;width:17px;height:8px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1813" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:326px;top:5225px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <img class="xr_rn_ xr_ap" src="index_html_files/83.webp" alt="" title="" style="left:12px;top:4445px;width:179px;height:268px;"/>
+ <div class="xr_scra xr_trigo_xr_ce86" style="position:absolute;left:9px;top:4010px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1815" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:9px; top:4010px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">01.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce87" style="position:absolute;left:12px;top:4719px;width:454px;height:226px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1825" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/84.webp" alt="" title="" style="left:12px;top:4719px;width:454px;height:226px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce88" style="position:absolute;left:12px;top:4086px;width:454px;height:372px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1829" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:12px; top:4086px; width:454px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Choose a Modular Website </h1>
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: 10.55px;margin:0;">Template</h1>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 0px; top: 67.57px;">Designs Gallery: Websites </span>
+  <span class="xr_tl Normal_text xr_s17 xr_bold" style="left: 250.64px; top: 67.57px;"> Modular Websites</span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 94.53px;">The Designs Gallery is where you’ll find all our newest </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 121.49px;">website templates, as well as website blocks, </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 148.45px;">components and royalty free stock photos and </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 175.41px;">illustrations. Additionally, you can visit Elements to </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 202.38px;">download an extensive library of resources and </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 229.34px;">designs - Menu: New From Elements </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 326.84px; top: 229.34px;"> Websites </span>
+ </div>
+ </div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce89" style="position:absolute;left:170px;top:4687px;width:61px;height:87px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1947" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/85.webp" alt="" title="" style="left:170px;top:4687px;width:61px;height:87px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce90" style="position:absolute;left:225px;top:4765px;width:25px;height:21px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1949" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/86.webp" alt="" title="" style="left:225px;top:4765px;width:25px;height:21px;"/>
+ </div>
+</div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce91" style="position:absolute;left:322px;top:4327px;width:17px;height:8px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1951" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:322px;top:4327px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <div class="xr_scra xr_trigo_xr_ce92" style="position:absolute;left:245px;top:4165px;width:17px;height:8px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_1953" style="left:0; top:0; visibility: hidden; display: none;">
+ <span class="xr_ar" style="left:245px;top:4165px;width:17px;height:8px; overflow: visible;pointer-events: none;"><svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; viewBox: 0 0 17 8; pointer-events: none;" >  <path fill="#22313E" stroke="Transparent" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"d="M 17.29 3.82 C 17.29 3.82 17.29 3.82 17.29 3.82 C 17.29 3.77 17.29 3.73 17.27 3.69 C 17.25 3.65 17.23 3.62 17.19 3.59 L 13.35 0.08 C 13.3 0.04 13.24 0.02 13.18 0.01 C 13.12 0 13.06 0.01 13 0.03 C 12.94 0.06 12.89 0.1 12.86 0.15 C 12.83 0.2 12.81 0.26 12.81 0.32 L 12.81 2.57 L 0.32 2.57 C 0.23 2.57 0.15 2.6 0.09 2.66 C 0.03 2.72 0 2.79 0 2.89 L 0 4.81 C 0 4.9 0.03 4.97 0.09 5.03 C 0.15 5.09 0.23 5.12 0.32 5.13 L 12.81 5.13 L 12.81 7.37 C 12.81 7.43 12.83 7.49 12.86 7.54 C 12.9 7.59 12.95 7.63 13 7.66 C 13.06 7.68 13.12 7.69 13.18 7.68 C 13.24 7.67 13.3 7.64 13.35 7.6 L 17.19 4.06 C 17.23 4.03 17.25 3.99 17.27 3.95 C 17.29 3.9 17.29 3.86 17.29 3.82 Z" fill-rule="evenodd" pointer-events="visible" />
+ </svg></span>
+ </div>
+</div>
+<div class="xr_group">
+ <img class="xr_ap" src="index_html_files/87.webp" alt="" title="" style="left:366px;top:6793px;width:104px;height:120px;"/>
+ <img class="xr_rn_ xr_ap" src="index_html_files/88.webp" alt="" title="" style="left:-15px;top:6908px;width:482px;height:265px;"/>
+ <div class="xr_scra xr_trigo_xr_ce93" style="position:absolute;left:9px;top:6476px;width:128px;height:71px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1955" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Heading_1 TITLE xr_s16 xr_bold" style="position: absolute; left:9px; top:6476px; width:128px; height:10px;">
+  <span class="xr_tl Heading_1 TITLE xr_s16 xr_bold" style="left: 0px; top: -102.61px;">04.</span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce94" style="position:absolute;left:12px;top:6565px;width:458px;height:234px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac xr_scra" id="xr_xpxr_1965" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt xr_s4" style="position: absolute; left:12px; top:6565px; width:458px; height:10px;">
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: -38.48px;margin:0;">Change and add new </h1>
+  <h1 class="xr_tl Heading_1 xr_s15" style="left: 0px; top: 10.55px;margin:0;">photos</h1>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 67.57px;">To add a photo to any page, simply drag and drop a </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 94.53px;">photo file from the Windows File Explorer. If you drop </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 121.49px;">the photo on the page or on top of some text, it is </span>
+  <span class="xr_tl Normal_text xr_s6" style="left: 0px; top: 148.45px;">added as a new photo </span>
+ </div>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce95" style="position:absolute;left:57px;top:6926px;width:193px;height:137px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_2038" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/89.webp" alt="" title="" style="left:57px;top:6926px;width:193px;height:137px;"/>
+ </div>
+ <div class="xr_scra xr_trigo_xr_ce96" style="position:absolute;left:203px;top:6888px;width:170px;height:108px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac xr_scra" id="xr_xpxr_2042" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" src="index_html_files/90.webp" alt="" title="" style="left:203px;top:6888px;width:170px;height:108px;"/>
+ </div>
+</div>
+<div class="xr_xpos" style="position:absolute; left: 446px; top: 0px; width:24px; height:60px;">
+<div id="xr_nb5" class="xr_ar">
+ <div class="xr_ar xr_nb0">
+ <a href="javascript:;" aria-haspopup="true" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/91.webp" alt="" title="" style="left:0px;top:0px;width:24px;height:60px;"/>
+ </a>
+  <div class="xr_nb2 xr_nb5 xr_smp0_-24" style="left:0px; top:60px; min-width:24px;">
+  <ul class="xr_nb4">
+   <li><a href="index.html" target="_self">Home</a>
+   </li>
+   <li><a href="text.html" target="_self">Text</a>
+   </li>
+   <li><a href="color.html" target="_self">Color</a>
+   </li>
+   <li><a href="photo.html" target="_self">Photo</a>
+   </li>
+   <li><a href="animation.html" target="_self">Animation</a>
+   </li>
+   <li><a href="navigation.html" target="_self">Navigation</a>
+   </li>
+  </ul>
+  </div>
+ </div>
+</div>
+</div>
+<div class="xr_group">
+<div class="xr_group">
+ <span class="xr_ar xr_scstrch" style="height: 92px; top: 10247px; position: absolute; background-color: #632ACF;"></span>
+ <div class="xr_trigo_xr_ce97" style="position:absolute;left:0px;top:10247px;width:480px;height:92px;z-index:-1;"></div>
+ <div class="xr_ap xr_ac" id="xr_xpxr_2046" style="left:0; top:0; visibility: hidden; display: none;">
+ <div class="xr_txt Normal_text xr_s20" style="position: absolute; left:170px; top:10277px; width:300px; height:10px;">
+  <span class="xr_tr Normal_text xr_s20" style="left: 48.5px; top: -14.96px; width: 255px;"><span id="Xxr_v2_LayoutControl:58stretch"></span>Website made using only Xara Web </span>
+  <span class="xr_tr Normal_text xr_s20" style="left: -24.5px; top: 6.01px; width: 328px;">Designer+, and no other graphics or software </span>
+  <span class="xr_tr Normal_text xr_s20" style="left: 260.82px; top: 26.98px; width: 39px;">tools.</span>
+ </div>
+ </div>
+ <div class="xr_trigo_xr_ce98" style="position:absolute;left:0px;top:10247px;width:480px;height:92px;z-index:-1;"></div>
+ <div class="xr_apq xr_ac" id="xr_xpxr_2074" style="left:0; top:0; visibility: hidden; display: none;">
+ <img class="xr_rn_ xr_ap" id="Xxr_v2_type:58invertedlogo" src="index_html_files/92.webp" alt="" title="" style="left:10px;top:10275px;width:105px;height:36px;"/>
+ </div>
+</div>
+</div>
+ <div class="xr_trigs xr_trigo_xr_ce99" style="position:absolute;left:-34px;top:10306px;width:0px;height:0px;visibility:hidden;z-index:-1;"></div>
+ <div id="xr_xd6"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="xr_apq  xr_mvp_1 " style="top:0px; left:0px; width:0px; height:0px; text-align:left;">
+ <div class="xr_apq xr_ac xr_stickie" id="xr_xpxr_418" style="position:fixed;right:0px;bottom:-1px;width:59px;height:59px; visibility: hidden; display: none;">
+ <a href="javascript:xr_top();" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/33.webp" alt="" title="" onmousemove="xr_mo(this,6,event)" style="left:0px;top:0px;width:59px;height:59px;"/>
+ </a>
+ </div>
+</div>
+<div class="xr_apq  xr_mvp_2  xr_mvpo " style="top:0px; left:0px; width:0px; height:0px; text-align:left;">
+ <div class="xr_apq xr_ac xr_stickie" id="xr_xpxr_2078" style="position:fixed;left:0px;bottom:0px;width:33px;height:33px; visibility: hidden; display: none;">
+ <a href="javascript:xr_top();" onclick="return(xr_nn());" ontouchstart="xr_mtch();">
+  <img class="xr_rn_ xr_ap" src="index_html_files/93.webp" alt="" title="" onmousemove="xr_mo(this,6,event)" style="left:0px;top:0px;width:33px;height:33px;"/>
+ </a>
+ </div>
+</div>
+</div >
+<!--[if IE]><script>xr_aeh()</script><![endif]--><!--[if !IE]>--><script>xr_htm();repMobFonts();window.addEventListener('load', xr_aeh, false);</script><!--<![endif]-->
+</body>
+</html>
