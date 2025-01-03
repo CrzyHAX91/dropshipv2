@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - main
-  merge_group:
+  pull_request_target:
     branches:
       - main
   schedule:
@@ -22,8 +22,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install OSV Scanner
+        run: |
+          python -m pip install --upgrade pip
+          pip install osv-scanner
 
       - name: Run OSV Scanner
         run: |
           echo "Running OSV Scanner..."
+          osv-scanner --all
